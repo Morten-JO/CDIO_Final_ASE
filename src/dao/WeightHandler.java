@@ -1,6 +1,6 @@
-package dto;
+package dao;
 
-import dao.Weight;
+import dto.Weight;
 
 public class WeightHandler {
 
