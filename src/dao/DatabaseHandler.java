@@ -73,6 +73,8 @@ public class DatabaseHandler {
 		}
 	}
 	
-	
+	public String[] getRaavareForProduktBatch(int id){
+		return null;
+	}
 	
 }

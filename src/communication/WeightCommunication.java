@@ -15,6 +15,7 @@ public class WeightCommunication implements Runnable{
 	private PrintWriter writer;
 	private Thread thread;
 	private DatabaseHandler handler;
+	private String[] raavare;
 	
 	public WeightCommunication(Socket socket, BufferedReader reader, PrintWriter writer, DatabaseHandler handler){
 		this.socket = socket;
@@ -34,7 +35,25 @@ public class WeightCommunication implements Runnable{
 		while(running){
 			handleUserConfirmId();
 			if(handleGetProduktBatchReceptName()){
-				
+				for(int i = 0; i < raavare.length; i++){
+					try {
+						writer.println("RM20 8 \"Er vægten ubelastet?\" \"\" \"&3\"");
+						String str = reader.readLine();
+						if(str.startsWith("RM20 A")){
+							String[] splits = str.split(" ");
+							if(splits.length > 2){
+								String response = splits[2];
+								response = response.replace("\"", "");
+								if(response.equals("ja")){
+									writer.println("D \""+raavare[i]+"\"");
+									//fortsæt fra 8 til 14
+								}
+							}
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	}
@@ -75,7 +94,7 @@ public class WeightCommunication implements Runnable{
 									splits = str2.split(" ");
 									if(splits.length > 2){
 										String response = splits[2];
-										response.replace("\"", "");
+										response = response.replace("\"", "");
 										if(response.equals("ja")){
 											validOprId = true;
 										}
@@ -103,12 +122,13 @@ public class WeightCommunication implements Runnable{
 				String[] splits = str.split(" ");
 				if(splits.length > 2){
 					String id = splits[2];
-					id.replace("\"", "");
+					id = id.replace("\"", "");
 					try{
 						int integer_id = Integer.parseInt(id);
 						String name = handler.getReceptNameFromProduktBatchId(integer_id);
 						if(name != null){
 							writer.println("D \""+name+"\"");
+							raavare = handler.getRaavareForProduktBatch(integer_id);
 							return true;
 						}
 					} catch(NumberFormatException e){}

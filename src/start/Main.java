@@ -12,6 +12,5 @@ public class Main {
 		} else{
 			System.err.println("Weights txt is invalid!");
 		}
-		
 	}
 }
