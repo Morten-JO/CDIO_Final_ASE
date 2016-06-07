@@ -19,6 +19,7 @@ public class GUIWeightWindow extends JFrame{
 		this.add(panel);
 		this.pack();
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.setResizable(false);
 		this.setVisible(true);
 	}
 	
