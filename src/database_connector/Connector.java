@@ -12,7 +12,7 @@ public class Connector {
     private static final String HOST     = "ec2-52-30-89-247.eu-west-1.compute.amazonaws.com";
     private static final int    PORT     = 3306;
     private static final String DATABASE = "grp24";
-    private static final String USERNAME = "grp24"; 
+    private static final String USERNAME = "grp24";
     private static final String PASSWORD = "a";
     private static Connection connection;
     
