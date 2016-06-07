@@ -41,6 +41,11 @@ public class GUIWeightPanel extends JPanel implements Observer{
 	public void refreshListModel(){
 		if(textPane != null){
 			textPane.removeAll();
+			try {
+				textPane.getStyledDocument().remove(0, textPane.getStyledDocument().getLength());
+			} catch (BadLocationException e1) {
+				e1.printStackTrace();
+			}
 			StyledDocument document = textPane.getStyledDocument();
 			textPane.setEditable(false);
 			Style redStyle = textPane.addStyle("red", null);
