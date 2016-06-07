@@ -25,6 +25,7 @@ public class GUIWeightPanel extends JPanel implements Observer{
 	public GUIWeightPanel(SocketHandler handler){
 		super();
 		this.handler = handler;
+		handler.addObserver(this);
 		refreshBtn = new JButton("Refresh weights");
 		refreshBtn.addActionListener(new ActionListener() {
 			@Override
