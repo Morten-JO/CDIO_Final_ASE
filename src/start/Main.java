@@ -13,7 +13,7 @@ public class Main {
 			new GUIWeightWindow(handler);
 			handler.start();
 		} else{
-			System.err.println("Weights txt is invalid!");
+			System.err.println("Weights.txt is invalid!");
 		}
 	}
 }

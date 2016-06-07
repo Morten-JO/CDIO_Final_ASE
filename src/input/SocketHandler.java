@@ -5,14 +5,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.Observable;
 
 import communication.WeightCommunication;
 import dao.DatabaseHandler;
 
-public class SocketHandler{
+public class SocketHandler extends Observable{
 
 	private boolean running;
 	private Socket socket;
@@ -35,9 +34,13 @@ public class SocketHandler{
 		while(true){
 			forceStart = false;
 			connectToWeights();
-			System.out.println("RAN");
 			long timeToReach = System.currentTimeMillis() + timePerStart;
 			while(timeToReach > System.currentTimeMillis() && !forceStart){
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				//Waiting amount of time till next attempt to start them.
 			}
 		}
@@ -69,6 +72,8 @@ public class SocketHandler{
 			}
 		}
 		System.out.println("-----------------------------------------");
+		setChanged();
+		notifyObservers("update");
 	}
 	
 	public Socket getsocket(){
@@ -81,7 +86,6 @@ public class SocketHandler{
 	
 	public void forcePassiveRefresh(){
 		forceStart = true;
-		System.out.println("forcestarted! is: "+forceStart);
 	}
 	
 	public WeightCommunication[] getWeights(){

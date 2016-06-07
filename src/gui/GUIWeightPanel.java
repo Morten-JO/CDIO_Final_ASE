@@ -3,6 +3,8 @@ package gui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -14,13 +16,15 @@ import javax.swing.text.StyledDocument;
 
 import input.SocketHandler;
 
-public class GUIWeightPanel extends JPanel{
+public class GUIWeightPanel extends JPanel implements Observer{
 
 	private JButton refreshBtn;
 	private JTextPane textPane;
+	private SocketHandler handler;
 	
 	public GUIWeightPanel(SocketHandler handler){
 		super();
+		this.handler = handler;
 		refreshBtn = new JButton("Refresh weights");
 		refreshBtn.addActionListener(new ActionListener() {
 			@Override
@@ -29,12 +33,12 @@ public class GUIWeightPanel extends JPanel{
 			}
 		});
 		textPane = new JTextPane();
-		refreshListModel(handler);
+		refreshListModel();
 		this.add(refreshBtn);
 		this.add(textPane);
 	}
 	
-	public void refreshListModel(SocketHandler handler){
+	public void refreshListModel(){
 		if(textPane != null){
 			textPane.removeAll();
 			StyledDocument document = textPane.getStyledDocument();
@@ -70,5 +74,11 @@ public class GUIWeightPanel extends JPanel{
 			}
 		}
 	}
-	
+
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		if(arg1.equals("update")){
+			refreshListModel();
+		}
+	}
 }
