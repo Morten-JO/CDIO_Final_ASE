@@ -31,7 +31,7 @@ public class SocketHandler extends Observable{
 	}
 	
 	public void start() {
-		while(true){
+		while(running){
 			forceStart = false;
 			connectToWeights();
 			long timeToReach = System.currentTimeMillis() + timePerStart;
@@ -94,5 +94,25 @@ public class SocketHandler extends Observable{
 	
 	public String[] getIps(){
 		return ips;
+	}
+	
+	public void shutdownASE(){
+		for(int i = 0; i < coms.length; i++){
+			if(coms[i] != null){
+				if(coms[i].isRunning()){
+					coms[i].setRunning(false);
+					try {
+						coms[i].getReader().close();
+						coms[i].getWriter().close();
+						coms[i].getSocket().close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					coms[i] = null;
+				}
+			}
+		}
+		running = false;
+		forceStart = true;
 	}
 }

@@ -193,4 +193,8 @@ public class WeightCommunication implements Runnable{
 	public boolean isRunning(){
 		return running;
 	}
+	
+	public void setRunning(boolean running){
+		this.running = running;
+	}
 }
