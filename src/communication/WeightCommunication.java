@@ -16,13 +16,14 @@ public class WeightCommunication implements Runnable{
 	private Thread thread;
 	private DatabaseHandler handler;
 	private String[] raavare;
+	private int transactionProduktBatchID;
 	
 	public WeightCommunication(Socket socket, BufferedReader reader, PrintWriter writer, DatabaseHandler handler){
 		this.socket = socket;
 		this.reader = reader;
 		this.writer = writer;
 		running = true;
-		this.thread = new Thread();
+		this.thread = new Thread(this);
 		this.handler = handler;
 	}
 	
@@ -33,27 +34,10 @@ public class WeightCommunication implements Runnable{
 	@Override
 	public void run() {
 		while(running){
+			System.out.println("muu");
 			handleUserConfirmId();
 			if(handleGetProduktBatchReceptName()){
-				for(int i = 0; i < raavare.length; i++){
-					try {
-						writer.println("RM20 8 \"Er vægten ubelastet?\" \"\" \"&3\"");
-						String str = reader.readLine();
-						if(str.startsWith("RM20 A")){
-							String[] splits = str.split(" ");
-							if(splits.length > 2){
-								String response = splits[2];
-								response = response.replace("\"", "");
-								if(response.equals("ja")){
-									writer.println("D \""+raavare[i]+"\"");
-									//fortsæt fra 8 til 14
-								}
-							}
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+				handleMeasuringLoop();
 			}
 		}
 	}
@@ -77,31 +61,28 @@ public class WeightCommunication implements Runnable{
 		boolean validOprId = false;
 		while(!validOprId){
 			try {
-				writer.println("RM20 8 \"Indtast ID\" \"\" \"&3\"");
+				writer.println("RM20 8 \"Enter ID\" \"\" \"&3\"");
+				reader.readLine();
 				String str = reader.readLine();
 				if(str.contains("RM20 A")){
 					String[] splits = str.split(" ");
 					if(splits.length > 2){
 						String id = splits[2];
-						id.replace("\"", "");
+						id = id.replace("\"", "");
 						try{
 							int integer_id = Integer.parseInt(id);
 							String name = handler.getOperatoerNameFromId(integer_id);
 							if(name != null){
-								writer.println("RM20 8 \""+name+", fortsæt?\" \"\" \"&3\"");
+								writer.println("RM20 8 \"Confirm name: "+name+"\" \"\" \"&3\"");
+								reader.readLine();
 								String str2 = reader.readLine();
-								if(str.contains("RM20 A")){
-									splits = str2.split(" ");
-									if(splits.length > 2){
-										String response = splits[2];
-										response = response.replace("\"", "");
-										if(response.equals("ja")){
-											validOprId = true;
-										}
-									}
+								if(str2.contains("RM20 A")){
+									validOprId = true;
 								}
 							}
-						} catch(NumberFormatException e){}
+						} catch(NumberFormatException e){
+							e.printStackTrace();
+						}
 					}
 				} 
 			} catch (IOException e) {
@@ -116,7 +97,8 @@ public class WeightCommunication implements Runnable{
 	 */
 	private boolean handleGetProduktBatchReceptName(){
 		try {
-			writer.println("RM20 8 \"Indtast produktbatch nr\" \"\" \"&3\"");
+			writer.println("RM20 8 \"Type produktbatch nr\" \"\" \"&3\"");
+			reader.readLine();
 			String str = reader.readLine();
 			if(str.startsWith("RM20 A")){
 				String[] splits = str.split(" ");
@@ -125,10 +107,12 @@ public class WeightCommunication implements Runnable{
 					id = id.replace("\"", "");
 					try{
 						int integer_id = Integer.parseInt(id);
-						String name = handler.getReceptNameFromProduktBatchId(integer_id);
+						transactionProduktBatchID = integer_id;
+						String name = handler.getReceptNameFromProduktBatchId(transactionProduktBatchID);
 						if(name != null){
-							writer.println("D \""+name+"\"");
-							raavare = handler.getRaavareForProduktBatch(integer_id);
+							writer.println("P111 \"Ingredient: "+name+"\"");
+							reader.readLine();
+							raavare = handler.getRaavareForProduktBatch(handler.getReceptIdFromProduktBatchId(transactionProduktBatchID));
 							return true;
 						}
 					} catch(NumberFormatException e){}
@@ -141,4 +125,65 @@ public class WeightCommunication implements Runnable{
 		return false;
 	}
 	
+	/**
+	 * Used for the procedure 8-end
+	 */
+	private void handleMeasuringLoop(){
+		for(int i = 0; i < raavare.length; i++){
+			try {
+				writer.println("RM20 8 \"Confirm clean\" \"\" \"&3\"");
+				reader.readLine();
+				String str = reader.readLine();
+				if(str.startsWith("RM20 A")){
+					writer.println("P111 \"Ingredient: "+raavare[i]+"\"");
+					reader.readLine();
+					handler.setProduktBatchStatus(transactionProduktBatchID, 1);
+					writer.println("T");
+					String tara = reader.readLine();
+					writer.println("RM20 8 \"Place holder\" \"\" \"&3\"");
+					reader.readLine();
+					String res = reader.readLine();
+					if(res.startsWith("RM20 A")){
+						writer.println("T");
+						String weight = reader.readLine();
+						writer.println("RM20 8 \"Enter rb nr: \" \"\" \"&3\"");
+						reader.readLine();
+						String resp = reader.readLine();
+						if(resp.startsWith("RM20 A")){
+							String[] respSplit = resp.split(" ");
+							if(respSplit.length > 2){
+								String rb_id = respSplit[2];
+								rb_id = rb_id.replace("\"", "");
+								try{
+									int integer_id = Integer.parseInt(rb_id);
+									Double maengde = handler.getMaengdeFromRaavareBatchId(integer_id);
+									writer.println("P111 \"Ingre: "+raavare[i]+" Amount: "+maengde+"\"");
+									reader.readLine();
+									writer.println("ST 1");
+									reader.readLine();
+									String maengdeWeight = reader.readLine();
+									writer.println("ST 0");
+									reader.readLine();
+									if(i != raavare.length-1){
+										writer.println("RM20 8 \"Finished item\" \"\" \"&3\"");
+										reader.readLine();
+										reader.readLine();
+									} else{
+										writer.println("RM20 8 \"Done! Resetting.\" \"\" \"&3\"");
+										reader.readLine();
+										reader.readLine();
+										handler.setProduktBatchStatus(transactionProduktBatchID, 2);
+									}
+								} catch(NumberFormatException e){
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
