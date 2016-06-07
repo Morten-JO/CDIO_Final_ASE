@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -29,7 +30,8 @@ public class SocketHandler {
 	public void start() {
 		for(int i = 0; i < ips.length; i++){
 			try {
-				socket = new Socket(ips[i], port);
+				socket = new Socket();
+				socket.connect(new InetSocketAddress(ips[i], port), 3000);
 				BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
 				WeightCommunication comm = new WeightCommunication(socket, reader, writer, handler);
