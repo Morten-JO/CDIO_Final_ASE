@@ -34,7 +34,6 @@ public class WeightCommunication implements Runnable{
 	@Override
 	public void run() {
 		while(running){
-			System.out.println("muu");
 			handleUserConfirmId();
 			if(handleGetProduktBatchReceptName()){
 				handleMeasuringLoop();
@@ -87,6 +86,8 @@ public class WeightCommunication implements Runnable{
 				} 
 			} catch (IOException e) {
 				e.printStackTrace();
+				running = true;
+				validOprId = true;
 			}
 		}
 	}
@@ -97,7 +98,7 @@ public class WeightCommunication implements Runnable{
 	 */
 	private boolean handleGetProduktBatchReceptName(){
 		try {
-			writer.println("RM20 8 \"Type produktbatch nr\" \"\" \"&3\"");
+			writer.println("RM20 8 \"Enter produktbatch nr\" \"\" \"&3\"");
 			reader.readLine();
 			String str = reader.readLine();
 			if(str.startsWith("RM20 A")){
@@ -121,6 +122,7 @@ public class WeightCommunication implements Runnable{
 			
 		} catch (IOException e) {
 			e.printStackTrace();
+			running = false;
 		}
 		return false;
 	}
@@ -131,7 +133,7 @@ public class WeightCommunication implements Runnable{
 	private void handleMeasuringLoop(){
 		for(int i = 0; i < raavare.length; i++){
 			try {
-				writer.println("RM20 8 \"Confirm clean\" \"\" \"&3\"");
+				writer.println("RM20 8 \"Confirm empty weight\" \"\" \"&3\"");
 				reader.readLine();
 				String str = reader.readLine();
 				if(str.startsWith("RM20 A")){
@@ -140,13 +142,13 @@ public class WeightCommunication implements Runnable{
 					handler.setProduktBatchStatus(transactionProduktBatchID, 1);
 					writer.println("T");
 					String tara = reader.readLine();
-					writer.println("RM20 8 \"Place holder\" \"\" \"&3\"");
+					writer.println("RM20 8 \"Place tara container\" \"\" \"&3\"");
 					reader.readLine();
 					String res = reader.readLine();
 					if(res.startsWith("RM20 A")){
 						writer.println("T");
 						String weight = reader.readLine();
-						writer.println("RM20 8 \"Enter rb nr: \" \"\" \"&3\"");
+						writer.println("RM20 8 \"Enter raavarebatch nr:\" \"\" \"&3\"");
 						reader.readLine();
 						String resp = reader.readLine();
 						if(resp.startsWith("RM20 A")){
@@ -183,6 +185,7 @@ public class WeightCommunication implements Runnable{
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
+				running = true;
 			}
 		}
 	}

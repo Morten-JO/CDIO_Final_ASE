@@ -9,11 +9,11 @@ import java.sql.Statement;
 /** @author Gruppe_24 */
 public class Connector {
 	private static Connector conn = null;
-    private static final String HOST     = "localhost";
+    private static final String HOST     = "ec2-52-30-89-247.eu-west-1.compute.amazonaws.com";
     private static final int    PORT     = 3306;
-    private static final String DATABASE = "cdio_db";
-    private static final String USERNAME = "root"; 
-    private static final String PASSWORD = "";
+    private static final String DATABASE = "grp24";
+    private static final String USERNAME = "grp24"; 
+    private static final String PASSWORD = "a";
     private static Connection connection;
     
     private Connector() {

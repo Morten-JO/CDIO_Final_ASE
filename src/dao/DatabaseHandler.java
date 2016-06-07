@@ -42,7 +42,6 @@ public class DatabaseHandler {
 			e.printStackTrace();
 		}
 		if(dto != null){
-			System.out.println("recept id: "+dto.getReceptId());
 			MYSQLReceptDAO dao2 = new MYSQLReceptDAO();
 			ReceptDTO dto2 = null;
 			try {
@@ -51,7 +50,6 @@ public class DatabaseHandler {
 				e.printStackTrace();
 			}
 			if(dto2 != null){
-				System.out.println("returning it...");
 				return dto2.getReceptNavn();
 			}
 			else{
