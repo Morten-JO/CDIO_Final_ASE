@@ -57,7 +57,7 @@ public class MYSQLReceptDAO implements ReceptDAO{
 		    CallableStatement createRecept = (CallableStatement) Connector.getInstance().getConnection().prepareCall("call add_recept(?)");
 			createRecept.setString(1, recept.getReceptNavn());	   
 			createRecept.execute();  
-			ResultSet rs = Connector.getInstance().doQuery("select max(recept_id) from recept;");
+			ResultSet rs = Connector.getInstance().doQuery("select max(receptId) from recept;");
 			if (rs.first()){   
 				id = rs.getInt(1);		
 			}
@@ -72,7 +72,7 @@ public class MYSQLReceptDAO implements ReceptDAO{
 	public void updateRecept(ReceptDTO recept) throws DALException {
 		try {
 			Connector.getInstance().doUpdate(
-					"UPDATE recept SET  recept_navn= '" + recept.getReceptNavn() + "' WHERE recept_id = " +
+					"UPDATE recept SET  recept_navn= '" + recept.getReceptNavn() + "' WHERE receptId = " +
 					recept.getReceptId());
 			
 		} catch (SQLException e) {
@@ -83,7 +83,7 @@ public class MYSQLReceptDAO implements ReceptDAO{
 	@Override
 	public ResultSet getFullRecept(String navn) {
 		try {
-			ResultSet getFullRecept = Connector.getInstance().doQuery("select * from view_fuldrecept where recept_navn = '"+navn+"';");
+			ResultSet getFullRecept = Connector.getInstance().doQuery("select * from view_fuldrecept where receptNavn = '"+navn+"';");
 			if (getFullRecept.first()){			    	
 				return getFullRecept;
 			}

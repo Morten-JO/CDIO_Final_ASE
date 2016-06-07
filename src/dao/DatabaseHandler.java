@@ -81,7 +81,7 @@ public class DatabaseHandler {
 	
 	public String[] getRaavareForProduktBatch(int id){
 		try {
-			ResultSet set = Connector.getInstance().doQuery("select * from raavare natural join receptkomponent where recept_id = "+id+";");
+			ResultSet set = Connector.getInstance().doQuery("select * from raavare natural join receptkomponent where receptId = "+id+";");
 			ArrayList<String> list = new ArrayList<String>();
 			while (set.next()) 
 			{

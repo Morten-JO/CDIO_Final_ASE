@@ -57,7 +57,7 @@ public class MYSQLProduktBatchDAO implements ProduktBatchDAO{
 		    createOP.setInt(2, produktbatch.getReceptId());
 		    createOP.execute();
 		    
-		    ResultSet rs = Connector.getInstance().doQuery("select max(pb_id) from produktbatch;");
+		    ResultSet rs = Connector.getInstance().doQuery("select max(pbId) from produktbatch;");
 			if (rs.first()){
 				int id = rs.getInt(1);
 				produktbatch.setPbId(id);
@@ -71,7 +71,7 @@ public class MYSQLProduktBatchDAO implements ProduktBatchDAO{
 	public void updateProduktBatch(ProduktBatchDTO produktbatch) throws DALException {
 		try {
 			Connector.getInstance().doUpdate(
-					"UPDATE produktbatch SET  status = " + produktbatch.getStatus() + "  WHERE pb_id = " +
+					"UPDATE produktbatch SET  status = " + produktbatch.getStatus() + "  WHERE pbId = " +
 					produktbatch.getPbId());
 
 		} catch (SQLException e) {

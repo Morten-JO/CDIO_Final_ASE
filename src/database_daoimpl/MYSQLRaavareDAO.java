@@ -57,7 +57,7 @@ public class MYSQLRaavareDAO implements RaavareDAO{
 		    createRaavare.setString(1, raavare.getRaavareNavn());
 		    createRaavare.setString(2, raavare.getLeverandoer());
 		    createRaavare.execute();
-		    ResultSet rs = Connector.getInstance().doQuery("select max(raavare_id) from raavare;");
+		    ResultSet rs = Connector.getInstance().doQuery("select max(raavareId) from raavare;");
 		    if (rs.first()){   
 		    	id =rs.getInt(1);		
 		    }
@@ -72,8 +72,8 @@ public class MYSQLRaavareDAO implements RaavareDAO{
 	public void updateRaavare(RaavareDTO raavare) throws DALException {
 		try {
 			Connector.getInstance().doUpdate(
-					"UPDATE raavare SET  raavare_navn= '" + raavare.getRaavareNavn() + "', leverandoer = '"
-							+ raavare.getLeverandoer() + "' WHERE raavare_id = " + raavare.getRaavareId());
+					"UPDATE raavare SET  raavareNavn= '" + raavare.getRaavareNavn() + "', leverandoer = '"
+							+ raavare.getLeverandoer() + "' WHERE raavareId = " + raavare.getRaavareId());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

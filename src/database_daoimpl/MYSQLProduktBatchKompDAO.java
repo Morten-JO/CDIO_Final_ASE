@@ -40,7 +40,7 @@ public class MYSQLProduktBatchKompDAO implements ProduktBatchKompDAO {
 	public List<ProduktBatchKompDTO> getProduktBatchKompList(int pbId) throws DALException {
 		List<ProduktBatchKompDTO> list = new ArrayList<ProduktBatchKompDTO>();
 		try{
-			ResultSet rs = Connector.getInstance().doQuery("SELECT * FROM produktbatchkomponent WHERE pb_id = " + pbId);
+			ResultSet rs = Connector.getInstance().doQuery("SELECT * FROM produktbatchkomponent WHERE pbId = " + pbId);
 			while (rs.next()) 
 			{
 				ProduktBatchKompDTO current = new ProduktBatchKompDTO(rs.getInt(1), rs.getInt(2), rs.getDouble(3), rs.getDouble(4), rs.getInt(5));				
@@ -90,8 +90,8 @@ public class MYSQLProduktBatchKompDAO implements ProduktBatchKompDAO {
 			Connector.getInstance().doUpdate(
 					"UPDATE produktbatchkomponent SET  tara= " + produktbatchkomponent.getTara()
 					+ ", netto =  " + produktbatchkomponent.getNetto()
-					+ ", opr_id = " + produktbatchkomponent.getOprId()+ " WHERE pb_id = " +
-					produktbatchkomponent.getPbId() + " and rb_id  = " + produktbatchkomponent.getRbId()+";");
+					+ ", oprId = " + produktbatchkomponent.getOprId()+ " WHERE pbId = " +
+					produktbatchkomponent.getPbId() + " and rbId  = " + produktbatchkomponent.getRbId()+";");
 			
 		} catch (SQLException e) {
 			e.printStackTrace();

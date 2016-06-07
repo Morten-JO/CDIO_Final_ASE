@@ -53,7 +53,7 @@ public class MYSQLRaavareBatchDAO implements RaavareBatchDAO{
 		List<RaavareBatchDTO> list = new ArrayList<RaavareBatchDTO>();
 		try
 		{
-			ResultSet rs = Connector.getInstance().doQuery("SELECT * FROM view_raavarebatch where raavare_id = "+raavareId);
+			ResultSet rs = Connector.getInstance().doQuery("SELECT * FROM view_raavarebatch where raavareId = "+raavareId);
 			while (rs.next()) 
 			{
 				RaavareBatchDTO current = new RaavareBatchDTO(rs.getInt(1), rs.getInt(2), rs.getDouble(3));
@@ -77,7 +77,7 @@ public class MYSQLRaavareBatchDAO implements RaavareBatchDAO{
 		    
 		    if (createOP.getInt(3) == 1){
 		    	int id = 0;
-			    ResultSet rs = Connector.getInstance().doQuery("select max(rb_id) from raavarebatch;");
+			    ResultSet rs = Connector.getInstance().doQuery("select max(rbId) from raavarebatch;");
 				if (rs.first()){   
 					id =rs.getInt(1);		
 				}
@@ -96,8 +96,8 @@ public class MYSQLRaavareBatchDAO implements RaavareBatchDAO{
 	public void updateRaavareBatch(RaavareBatchDTO raavarebatch) throws DALException {
 		try {
 			Connector.getInstance().doUpdate(
-					"UPDATE raavarebatch SET  raavare_id = " + raavarebatch.getRaavareId() + ", maengde =  " + raavarebatch.getMaengde() + 
-					" WHERE rb_id = " + raavarebatch.getRbId()
+					"UPDATE raavarebatch SET  raavareId = " + raavarebatch.getRaavareId() + ", maengde =  " + raavarebatch.getMaengde() + 
+					" WHERE rbId = " + raavarebatch.getRbId()
 			);
 		} catch (SQLException e) {
 			e.printStackTrace();

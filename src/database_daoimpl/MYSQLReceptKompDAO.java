@@ -41,7 +41,7 @@ public class MYSQLReceptKompDAO implements ReceptKompDAO {
 		List<ReceptKompDTO> list = new ArrayList<ReceptKompDTO>();
 		try {
 			ResultSet rs = Connector.getInstance()
-					.doQuery("SELECT * FROM receptkomponent where recept_id = " + receptId);
+					.doQuery("SELECT * FROM receptkomponent where receptId = " + receptId);
 			while (rs.next()) {
 				ReceptKompDTO current = new ReceptKompDTO(rs.getInt(1), rs.getInt(2), rs.getDouble(3), rs.getDouble(4));
 
@@ -90,9 +90,9 @@ public class MYSQLReceptKompDAO implements ReceptKompDAO {
 	public void updateReceptKomp(ReceptKompDTO receptkomponent) throws DALException {
 		try {
 			Connector.getInstance().doUpdate(
-					"UPDATE receptkomponent SET nom_netto =  " + receptkomponent.getNomNetto()
-					+ ", tolerance = " + receptkomponent.getTolerance()+ " WHERE recept_id = " +
-					receptkomponent.getReceptId() +" and raavare_id = "+receptkomponent.getRaavareId());
+					"UPDATE receptkomponent SET nomNetto =  " + receptkomponent.getNomNetto()
+					+ ", tolerance = " + receptkomponent.getTolerance()+ " WHERE receptId = " +
+					receptkomponent.getReceptId() +" and raavareId = "+receptkomponent.getRaavareId());
 			
 		} catch (SQLException e) {
 			e.printStackTrace();

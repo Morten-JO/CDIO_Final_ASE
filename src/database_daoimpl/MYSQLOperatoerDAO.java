@@ -47,7 +47,7 @@ public class MYSQLOperatoerDAO implements OperatoerDAO {
 			createOP.setBoolean(6, farmaceut);
 			createOP.setBoolean(7, vaerkfoerer);
 			createOP.execute();   
-			ResultSet rs = Connector.getInstance().doQuery("select max(opr_id) from operatoer;");
+			ResultSet rs = Connector.getInstance().doQuery("select max(oprId) from operatoer;");
 			if (rs.first()){
 				id = rs.getInt(1);
 				opr.setOprId(id);
