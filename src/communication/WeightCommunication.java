@@ -17,6 +17,7 @@ public class WeightCommunication implements Runnable{
 	private DatabaseHandler handler;
 	private String[] raavare;
 	private int transactionProduktBatchID;
+	private int currentOperatoerID;
 	
 	public WeightCommunication(Socket socket, BufferedReader reader, PrintWriter writer, DatabaseHandler handler){
 		this.socket = socket;
@@ -70,6 +71,7 @@ public class WeightCommunication implements Runnable{
 						id = id.replace("\"", "");
 						try{
 							int integer_id = Integer.parseInt(id);
+							currentOperatoerID = integer_id;
 							String name = handler.getOperatoerNameFromId(integer_id);
 							if(name != null){
 								writer.println("RM20 8 \"Confirm name: "+name+"\" \"\" \"&3\"");
@@ -85,8 +87,7 @@ public class WeightCommunication implements Runnable{
 					}
 				} 
 			} catch (IOException e) {
-				e.printStackTrace();
-				running = true;
+				running = false;
 				validOprId = true;
 			}
 		}
@@ -121,7 +122,6 @@ public class WeightCommunication implements Runnable{
 			}
 			
 		} catch (IOException e) {
-			e.printStackTrace();
 			running = false;
 		}
 		return false;
@@ -141,13 +141,13 @@ public class WeightCommunication implements Runnable{
 					reader.readLine();
 					handler.setProduktBatchStatus(transactionProduktBatchID, 1);
 					writer.println("T");
-					String tara = reader.readLine();
+					reader.readLine();
 					writer.println("RM20 8 \"Place tara container\" \"\" \"&3\"");
 					reader.readLine();
 					String res = reader.readLine();
 					if(res.startsWith("RM20 A")){
 						writer.println("T");
-						String weight = reader.readLine();
+						String tara = reader.readLine();
 						writer.println("RM20 8 \"Enter raavarebatch nr:\" \"\" \"&3\"");
 						reader.readLine();
 						String resp = reader.readLine();
@@ -158,14 +158,36 @@ public class WeightCommunication implements Runnable{
 								rb_id = rb_id.replace("\"", "");
 								try{
 									int integer_id = Integer.parseInt(rb_id);
-									Double maengde = handler.getMaengdeFromRaavareBatchId(integer_id);
+									Double maengde = handler.getMaengdeFromRBIDandPBID(integer_id, transactionProduktBatchID);
 									writer.println("P111 \"Ingre: "+raavare[i]+" Amount: "+maengde+"\"");
 									reader.readLine();
 									writer.println("ST 1");
 									reader.readLine();
-									String maengdeWeight = reader.readLine();
+									double maengdeOnWeight = 0.0;
+									boolean isInTolerance = false;
+									double toleranceAmount = handler.getToleranceFromRBIDandPBID(integer_id, transactionProduktBatchID);
+									writer.println("P121 "+maengde+" kg "+(maengde * toleranceAmount/100)+" kg "+(maengde * toleranceAmount/100)+" kg");
+									System.out.println("P121 "+maengde+" kg "+(maengde * toleranceAmount/100)+" kg "+(maengde * toleranceAmount/100)+" kg");
+									reader.readLine();
+									while(!isInTolerance){
+										String maengdeWeight = reader.readLine();
+										maengdeOnWeight = Double.parseDouble(maengdeWeight.substring(7, maengdeWeight.length()-3));
+										if(maengdeOnWeight > (maengde - maengde * toleranceAmount/100) && maengdeOnWeight < (maengde + maengde * toleranceAmount/100)){
+											isInTolerance = true;
+										} else{
+											writer.println("RM20 8 \"Not in tolerance!\" \"\" \"&3\"");
+											reader.readLine();
+											reader.readLine();
+										}
+									}
+									
 									writer.println("ST 0");
 									reader.readLine();
+									double taraOnWeight = Double.parseDouble(tara.substring(7, tara.length()-3));
+									System.out.println("NETTO: "+maengdeOnWeight);
+									System.out.println("TARA: "+taraOnWeight);
+									handler.updateProduktBatchKomponent(transactionProduktBatchID, integer_id, taraOnWeight, maengdeOnWeight, currentOperatoerID);
+									handler.removeNettoFromRaavareBatch(integer_id, maengdeOnWeight);
 									if(i != raavare.length-1){
 										writer.println("RM20 8 \"Finished item\" \"\" \"&3\"");
 										reader.readLine();
@@ -184,8 +206,7 @@ public class WeightCommunication implements Runnable{
 					}
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
-				running = true;
+				running = false;
 			}
 		}
 	}

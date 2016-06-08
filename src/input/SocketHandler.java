@@ -102,8 +102,6 @@ public class SocketHandler extends Observable{
 				if(coms[i].isRunning()){
 					coms[i].setRunning(false);
 					try {
-						coms[i].getReader().close();
-						coms[i].getWriter().close();
 						coms[i].getSocket().close();
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -114,5 +112,6 @@ public class SocketHandler extends Observable{
 		}
 		running = false;
 		forceStart = true;
+		System.out.println("Shutted system down");
 	}
 }
