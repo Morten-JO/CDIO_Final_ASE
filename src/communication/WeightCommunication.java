@@ -134,74 +134,78 @@ public class WeightCommunication implements Runnable{
 				reader.readLine();
 				String str = reader.readLine();
 				if(str.startsWith("RM20 A")){
-					writer.println("P111 \"Ingredient: "+raavare[i]+"\"");
-					reader.readLine();
-					handler.setProduktBatchStatus(transactionProduktBatchID, 1);
-					writer.println("T");
-					reader.readLine();
-					writer.println("RM20 8 \"Place tara container\" \"\" \"&3\"");
-					reader.readLine();
-					String res = reader.readLine();
-					if(res.startsWith("RM20 A")){
-						writer.println("T");
-						String tara = reader.readLine();
-						writer.println("RM20 8 \"Enter raavarebatch nr:\" \"\" \"&3\"");
+					handleRaavareMeasurement(i);
+				}
+		}
+	}
+
+	private void handleRaavareMeasurement(int i) throws IOException {
+		writer.println("P111 \"Ingredient: "+raavare[i]+"\"");
+		reader.readLine();
+		handler.setProduktBatchStatus(transactionProduktBatchID, 1);
+		writer.println("T");
+		reader.readLine();
+		writer.println("RM20 8 \"Place tara container\" \"\" \"&3\"");
+		reader.readLine();
+		String res = reader.readLine();
+		if(res.startsWith("RM20 A")){
+			writer.println("T");
+			String tara = reader.readLine();
+			writer.println("RM20 8 \"Enter raavarebatch nr:\" \"\" \"&3\"");
+			reader.readLine();
+			String resp = reader.readLine();
+			if(resp.startsWith("RM20 A")){
+				String[] respSplit = resp.split(" ");
+				if(respSplit.length > 2){
+					String rb_id = respSplit[2];
+					rb_id = rb_id.replace("\"", "");
+					try{
+						int integer_id = Integer.parseInt(rb_id);
+						Double maengde = handler.getMaengdeFromRBIDandPBID(integer_id, transactionProduktBatchID);
+						writer.println("P111 \"Ingre: "+raavare[i]+" Amount: "+maengde+"\"");
 						reader.readLine();
-						String resp = reader.readLine();
-						if(resp.startsWith("RM20 A")){
-							String[] respSplit = resp.split(" ");
-							if(respSplit.length > 2){
-								String rb_id = respSplit[2];
-								rb_id = rb_id.replace("\"", "");
-								try{
-									int integer_id = Integer.parseInt(rb_id);
-									Double maengde = handler.getMaengdeFromRBIDandPBID(integer_id, transactionProduktBatchID);
-									writer.println("P111 \"Ingre: "+raavare[i]+" Amount: "+maengde+"\"");
-									reader.readLine();
-									writer.println("ST 1");
-									reader.readLine();
-									double maengdeOnWeight = 0.0;
-									boolean isInTolerance = false;
-									double toleranceAmount = handler.getToleranceFromRBIDandPBID(integer_id, transactionProduktBatchID);
-									writer.println("P121 "+maengde+" kg "+(maengde * toleranceAmount/100)+" kg "+(maengde * toleranceAmount/100)+" kg");
-									System.out.println("P121 "+maengde+" kg "+(maengde * toleranceAmount/100)+" kg "+(maengde * toleranceAmount/100)+" kg");
-									reader.readLine();
-									while(!isInTolerance){
-										String maengdeWeight = reader.readLine();
-										maengdeOnWeight = Double.parseDouble(maengdeWeight.substring(7, maengdeWeight.length()-3));
-										if(maengdeOnWeight > (maengde - maengde * toleranceAmount/100) && maengdeOnWeight < (maengde + maengde * toleranceAmount/100)){
-											isInTolerance = true;
-										} else{
-											writer.println("RM20 8 \"Not in tolerance!\" \"\" \"&3\"");
-											reader.readLine();
-											reader.readLine();
-										}
-									}
-									
-									writer.println("ST 0");
-									reader.readLine();
-									double taraOnWeight = Double.parseDouble(tara.substring(7, tara.length()-3));
-									System.out.println("NETTO: "+maengdeOnWeight);
-									System.out.println("TARA: "+taraOnWeight);
-									handler.updateProduktBatchKomponent(transactionProduktBatchID, integer_id, taraOnWeight, maengdeOnWeight, currentOperatoerID);
-									handler.removeNettoFromRaavareBatch(integer_id, maengdeOnWeight);
-									if(i != raavare.length-1){
-										writer.println("RM20 8 \"Finished item\" \"\" \"&3\"");
-										reader.readLine();
-										reader.readLine();
-									} else{
-										writer.println("RM20 8 \"Done! Resetting.\" \"\" \"&3\"");
-										reader.readLine();
-										reader.readLine();
-										handler.setProduktBatchStatus(transactionProduktBatchID, 2);
-									}
-								} catch(NumberFormatException e){
-									e.printStackTrace();
-								}
+						writer.println("ST 1");
+						reader.readLine();
+						double maengdeOnWeight = 0.0;
+						boolean isInTolerance = false;
+						double toleranceAmount = handler.getToleranceFromRBIDandPBID(integer_id, transactionProduktBatchID);
+						writer.println("P121 "+maengde+" kg "+(maengde * toleranceAmount/100)+" kg "+(maengde * toleranceAmount/100)+" kg");
+						System.out.println("P121 "+maengde+" kg "+(maengde * toleranceAmount/100)+" kg "+(maengde * toleranceAmount/100)+" kg");
+						reader.readLine();
+						while(!isInTolerance){
+							String maengdeWeight = reader.readLine();
+							maengdeOnWeight = Double.parseDouble(maengdeWeight.substring(7, maengdeWeight.length()-3));
+							if(maengdeOnWeight > (maengde - maengde * toleranceAmount/100) && maengdeOnWeight < (maengde + maengde * toleranceAmount/100)){
+								isInTolerance = true;
+							} else{
+								writer.println("RM20 8 \"Not in tolerance!\" \"\" \"&3\"");
+								reader.readLine();
+								reader.readLine();
 							}
 						}
+						
+						writer.println("ST 0");
+						reader.readLine();
+						double taraOnWeight = Double.parseDouble(tara.substring(7, tara.length()-3));
+						System.out.println("NETTO: "+maengdeOnWeight);
+						System.out.println("TARA: "+taraOnWeight);
+						handler.updateProduktBatchKomponent(transactionProduktBatchID, integer_id, taraOnWeight, maengdeOnWeight, currentOperatoerID);
+						handler.removeNettoFromRaavareBatch(integer_id, maengdeOnWeight);
+						if(i != raavare.length-1){
+							writer.println("RM20 8 \"Finished item\" \"\" \"&3\"");
+							reader.readLine();
+							reader.readLine();
+						} else{
+							writer.println("RM20 8 \"Done! Resetting.\" \"\" \"&3\"");
+							reader.readLine();
+							reader.readLine();
+							handler.setProduktBatchStatus(transactionProduktBatchID, 2);
+						}
+					} catch(NumberFormatException e){
+						e.printStackTrace();
 					}
 				}
+			}
 		}
 	}
 
@@ -211,5 +215,31 @@ public class WeightCommunication implements Runnable{
 	
 	public void setRunning(boolean running){
 		this.running = running;
+	}
+	
+	private void writeReadLines(String...strings ) throws IOException{
+		for (String string : strings) {
+			writeReadLines(string);
+		}
+	}
+	
+	private void writeReadLines(String output) throws IOException{
+		writeReadLines(output,1);
+	}
+	
+	private void writeReadLines(String output, int lines) throws IOException{
+		writer.println(output);
+		for(int i = 0; i < lines; i++){
+			reader.readLine();
+		}
+	}
+	
+	private String writeReadRM20(String output) throws IOException{
+		writeReadLines(output);
+		//check if inputstream can be read
+		if(reader.ready()){
+			return reader.readLine();
+		}
+		return null;
 	}
 }
