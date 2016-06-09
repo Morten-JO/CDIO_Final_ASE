@@ -76,7 +76,9 @@ public class WeightingProcedure implements Runnable{
 			currentOperatoerID = integer_id;
 			String name = handler.getOperatoerNameFromId(integer_id);
 			if(name != null){
-				String str2 = comm.writeReadRM20("RM20 8 \"Confirm name: "+name+"\" \"\" \"&3\"");
+				//RM20 commands can only take up to max 23 characters in text
+				String cuttedString = HelpFunctions.cutStringRM20("Confirm name: "+name);
+				String str2 = comm.writeReadRM20("RM20 8 \""+cuttedString+"\" \"\" \"&3\"");
 				if(str2.contains("RM20 A")){
 					validOprId = true;
 				}
@@ -99,6 +101,9 @@ public class WeightingProcedure implements Runnable{
 						return true;
 					}
 				}
+			} else{
+				//force allow script to beginning
+				validOprId = false;
 			}
 			
 		return false;
@@ -131,14 +136,16 @@ public class WeightingProcedure implements Runnable{
 	private void handleMeasuringLoop() throws IOException, NullPointerException{
 		int doneItems = handler.getDoneRaavareForProduktBatch(transactionProduktBatchID);
 		for(int i = doneItems; i < raavare.length; i++){
-				String str = comm.writeReadRM20("RM20 8 \"Confirm empty weight\" \"\" \"&3\"");
-				if(str.startsWith("RM20 A")){
-					handleRaavareMeasurement(i);
+			String str = comm.writeReadRM20("RM20 8 \"Confirm empty weight\" \"\" \"&3\"");
+			if(str.startsWith("RM20 A")){
+				if(!handleRaavareMeasurement(i)){
+					break;
 				}
+			}
 		}
 	}
 
-	private void handleRaavareMeasurement(int i) throws IOException {
+	private boolean handleRaavareMeasurement(int i) throws IOException {
 		comm.writeReadLines("P111 \"Ingredient: "+raavare[i]+"\"");
 		handler.setProduktBatchStatus(transactionProduktBatchID, 1);
 		comm.writeReadLines("T");
@@ -150,9 +157,19 @@ public class WeightingProcedure implements Runnable{
 				String[] respSplit = resp.split(" ");
 				if(respSplit.length > 2){
 					handleRaavareMeasurementStepTwo(i, tara, respSplit);
+					return true;
 				}
+			} else{
+				//force run to beginning
+				validOprId = false;
+				return false;
 			}
+		} else{
+			//force run to beginning
+			validOprId = false;
+			return false;
 		}
+		return false;
 	}
 
 	private void handleRaavareMeasurementStepTwo(int i, String tara, String[] respSplit) throws IOException {
