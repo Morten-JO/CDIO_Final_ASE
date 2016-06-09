@@ -21,7 +21,7 @@ public class MYSQLProduktBatchDAO implements ProduktBatchDAO{
 			if (rs.first()){			    	
 				int pb_status = rs.getInt(2);
 				int pb_recept = rs.getInt(3);
-				ProduktBatchDTO newpb = new ProduktBatchDTO(pb_status, pb_recept);
+				ProduktBatchDTO newpb = new ProduktBatchDTO(pb_recept, pb_status);
 				newpb.setPbId(pbId);
 				return newpb;
 			}

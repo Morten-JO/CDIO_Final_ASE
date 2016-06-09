@@ -111,10 +111,15 @@ public class WeightingProcedure implements Runnable{
 			int integer_id = Integer.parseInt(id);
 			transactionProduktBatchID = integer_id;
 			String name = handler.getReceptNameFromProduktBatchId(transactionProduktBatchID);
-			if(name != null){
-				comm.writeReadLines("P111 \"Ingredient: "+name+"\"");
-				raavare = handler.getRaavareForProduktBatch(handler.getReceptIdFromProduktBatchId(transactionProduktBatchID));
-				return true;
+			if(handler.isStatusFreeFromProduktBatchId(transactionProduktBatchID)){
+				if(name != null){
+					comm.writeReadLines("P111 \"Ingredient: "+name+"\"");
+					raavare = handler.getRaavareForProduktBatch(handler.getReceptIdFromProduktBatchId(transactionProduktBatchID));
+					return true;
+				}
+			}
+			else{
+				comm.writeReadRM20("RM20 8 \"Produktbatch is done\" \"\" \"&3\"");
 			}
 		} catch(NumberFormatException e){}
 		return false;

@@ -196,4 +196,16 @@ public class DatabaseHandler {
 		}
 		return 0.0;
 	}
+	
+	public boolean isStatusFreeFromProduktBatchId(int id){
+		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
+		try {
+			ProduktBatchDTO dto = dao.getProduktBatch(id);
+			System.out.println(dto.getStatus());
+			return (dto.getStatus() == 0);
+		} catch (DALException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 }
