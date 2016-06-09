@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Observable;
 
-import communication.WeightCommunication;
+import communication.WeightingProcedure;
 import dao.DatabaseHandler;
 
 public class SocketHandler extends Observable{
@@ -18,7 +18,7 @@ public class SocketHandler extends Observable{
 	private String[] ips;
 	private int port;
 	private DatabaseHandler handler;
-	private WeightCommunication[] coms;
+	private WeightingProcedure[] coms;
 	private long timePerStart = 3600000;
 	private boolean forceStart;
 	
@@ -27,7 +27,7 @@ public class SocketHandler extends Observable{
 		this.ips = ips;
 		this.port = port;
 		handler = new DatabaseHandler();
-		coms = new WeightCommunication[ips.length];
+		coms = new WeightingProcedure[ips.length];
 	}
 	
 	public void start() {
@@ -62,7 +62,7 @@ public class SocketHandler extends Observable{
 					socket.connect(new InetSocketAddress(ips[i], port), 3000);
 					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-					WeightCommunication comm = new WeightCommunication(socket, reader, writer, handler);
+					WeightingProcedure comm = new WeightingProcedure(socket, reader, writer, handler);
 					comm.start();
 					coms[i] = comm;
 					System.out.println("Weight #"+(i+1)+" is now online with ip: "+ips[i]);
@@ -88,7 +88,7 @@ public class SocketHandler extends Observable{
 		forceStart = true;
 	}
 	
-	public WeightCommunication[] getWeights(){
+	public WeightingProcedure[] getWeights(){
 		return coms;
 	}
 	
