@@ -16,8 +16,9 @@ public class WeightCommunication implements Runnable{
 	private Thread thread;
 	private DatabaseHandler handler;
 	private String[] raavare;
-	private int transactionProduktBatchID;
+	private int transactionProduktBatchID = -1;//-1 to force sqlException to prevent integrity issues in case of failure before receiving batchID
 	private int currentOperatoerID;
+	boolean validOprId = false;
 	
 	public WeightCommunication(Socket socket, BufferedReader reader, PrintWriter writer, DatabaseHandler handler){
 		this.socket = socket;
@@ -35,9 +36,16 @@ public class WeightCommunication implements Runnable{
 	@Override
 	public void run() {
 		while(running){
-			handleUserConfirmId();
-			if(handleGetProduktBatchReceptName()){
-				handleMeasuringLoop();
+			try {
+				handleUserConfirmId();
+				if(handleGetProduktBatchReceptName()){
+					handleMeasuringLoop();
+				}
+			} catch (IOException | NullPointerException e) {
+				e.printStackTrace();
+				running = false;
+				validOprId = true;
+				handler.setProduktBatchStatus(transactionProduktBatchID, 0);
 			}
 		}
 	}
@@ -57,10 +65,8 @@ public class WeightCommunication implements Runnable{
 	/**
 	 * Used for the procedure 2-4
 	 */
-	private void handleUserConfirmId(){
-		boolean validOprId = false;
+	private void handleUserConfirmId() throws IOException, NullPointerException{
 		while(!validOprId){
-			try {
 				writer.println("RM20 8 \"Enter ID\" \"\" \"&3\"");
 				reader.readLine();
 				String str = reader.readLine();
@@ -86,10 +92,6 @@ public class WeightCommunication implements Runnable{
 						}
 					}
 				} 
-			} catch (IOException e) {
-				running = false;
-				validOprId = true;
-			}
 		}
 	}
 
@@ -97,8 +99,7 @@ public class WeightCommunication implements Runnable{
 	 * Used for the procedure 5-6
 	 * @return
 	 */
-	private boolean handleGetProduktBatchReceptName(){
-		try {
+	private boolean handleGetProduktBatchReceptName() throws IOException, NullPointerException{
 			writer.println("RM20 8 \"Enter produktbatch nr\" \"\" \"&3\"");
 			reader.readLine();
 			String str = reader.readLine();
@@ -121,18 +122,14 @@ public class WeightCommunication implements Runnable{
 				}
 			}
 			
-		} catch (IOException e) {
-			running = false;
-		}
 		return false;
 	}
 	
 	/**
 	 * Used for the procedure 8-end
 	 */
-	private void handleMeasuringLoop(){
+	private void handleMeasuringLoop() throws IOException, NullPointerException{
 		for(int i = 0; i < raavare.length; i++){
-			try {
 				writer.println("RM20 8 \"Confirm empty weight\" \"\" \"&3\"");
 				reader.readLine();
 				String str = reader.readLine();
@@ -205,9 +202,6 @@ public class WeightCommunication implements Runnable{
 						}
 					}
 				}
-			} catch (IOException e) {
-				running = false;
-			}
 		}
 	}
 
