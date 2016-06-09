@@ -6,13 +6,15 @@ public class ProduktBatchKompDTO {
 	double tara;
 	double netto;
 	int oprId; // operatoer-nummer
+	boolean done;
 
-	public ProduktBatchKompDTO(int pbId, int rbId, double tara, double netto, int oprId) {
+	public ProduktBatchKompDTO(int pbId, int rbId, double tara, double netto, int oprId, boolean done) {
 		this.pbId = pbId;
 		this.rbId = rbId;
 		this.tara = tara;
 		this.netto = netto;
 		this.oprId = oprId;
+		this.done = done;
 	}
 
 	public int getPbId() {
@@ -53,6 +55,14 @@ public class ProduktBatchKompDTO {
 
 	public void setOprId(int oprId) {
 		this.oprId = oprId;
+	}
+	
+	public boolean getDone(){
+		return done;
+	}
+	
+	public void setDone(boolean done){
+		this.done = done;
 	}
 
 	public String toString() {

@@ -129,7 +129,8 @@ public class WeightingProcedure implements Runnable{
 	 * Used for the procedure 8-end
 	 */
 	private void handleMeasuringLoop() throws IOException, NullPointerException{
-		for(int i = 0; i < raavare.length; i++){
+		int doneItems = handler.getDoneRaavareForProduktBatch(transactionProduktBatchID);
+		for(int i = doneItems; i < raavare.length; i++){
 				String str = comm.writeReadRM20("RM20 8 \"Confirm empty weight\" \"\" \"&3\"");
 				if(str.startsWith("RM20 A")){
 					handleRaavareMeasurement(i);
@@ -178,7 +179,7 @@ public class WeightingProcedure implements Runnable{
 			}
 			comm.writeReadLines("ST 0");
 			double taraOnWeight = Double.parseDouble(tara.substring(7, tara.length()-3));
-			handler.updateProduktBatchKomponent(transactionProduktBatchID, integer_id, taraOnWeight, maengdeOnWeight, currentOperatoerID);
+			handler.updateProduktBatchKomponent(transactionProduktBatchID, integer_id, taraOnWeight, maengdeOnWeight, currentOperatoerID, true);
 			handler.removeNettoFromRaavareBatch(integer_id, maengdeOnWeight);
 			if(i != raavare.length-1){
 				comm.writeReadRM20("RM20 8 \"Finished item\" \"\" \"&3\"");

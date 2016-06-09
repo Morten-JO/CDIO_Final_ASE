@@ -126,13 +126,14 @@ public class DatabaseHandler {
 		return 0;
 	}
 	
-	public boolean updateProduktBatchKomponent(int pbId, int rbId, double tara, double netto, int oprId){
+	public boolean updateProduktBatchKomponent(int pbId, int rbId, double tara, double netto, int oprId, boolean done){
 		MYSQLProduktBatchKompDAO dao = new MYSQLProduktBatchKompDAO();
 		try {
 			ProduktBatchKompDTO dto = dao.getProduktBatchKomp(pbId, rbId);
 			dto.setTara(tara);
 			dto.setNetto(netto);
 			dto.setOprId(oprId);
+			dto.setDone(done);
 			dao.updateProduktBatchKomp(dto);
 			return true;
 		} catch (DALException e) {
@@ -201,11 +202,26 @@ public class DatabaseHandler {
 		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
 		try {
 			ProduktBatchDTO dto = dao.getProduktBatch(id);
-			System.out.println(dto.getStatus());
 			return (dto.getStatus() == 0);
 		} catch (DALException e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
+	
+	public int getDoneRaavareForProduktBatch(int id){
+		int finished = 0;
+		try {
+			ResultSet set = Connector.getInstance().doQuery("select * from produktbatchkomponent where pbId = "+id+";");
+			while(set.next()){
+				if(set.getBoolean(6) == true){
+					finished++;
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return finished;
+	}
+	
 }

@@ -22,7 +22,7 @@ public class JUnit_ProduktBatchKomp {
 	@Test
 	public void a_getListProduktBatchKomp(){
 		produktbatchkomp = new MYSQLProduktBatchKompDAO();
-		produktbatchkompDTO = new ProduktBatchKompDTO(2, 3, 0.5, 100, 3);
+		//produktbatchkompDTO = new ProduktBatchKompDTO(2, 3, 0.5, 100, 3);
 		try {
 			List<ProduktBatchKompDTO> liste = produktbatchkomp.getProduktBatchKompList();
 			if(liste == null){

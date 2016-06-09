@@ -26,8 +26,8 @@ public class MYSQLProduktBatchKompDAO implements ProduktBatchKompDAO {
 				double tara= rs.getInt(3);;
 				double netto= rs.getInt(4);
 				int opr_id = rs.getInt(5);
-				    	
-				ProduktBatchKompDTO newPBKomp = new ProduktBatchKompDTO(pb_id, rb_id, tara, netto, opr_id);    	
+				boolean done = rs.getBoolean(6);
+				ProduktBatchKompDTO newPBKomp = new ProduktBatchKompDTO(pb_id, rb_id, tara, netto, opr_id, done);    	
 				return newPBKomp;
 			}
 		} catch (SQLException e) {
@@ -43,7 +43,7 @@ public class MYSQLProduktBatchKompDAO implements ProduktBatchKompDAO {
 			ResultSet rs = Connector.getInstance().doQuery("SELECT * FROM produktbatchkomponent WHERE pbId = " + pbId);
 			while (rs.next()) 
 			{
-				ProduktBatchKompDTO current = new ProduktBatchKompDTO(rs.getInt(1), rs.getInt(2), rs.getDouble(3), rs.getDouble(4), rs.getInt(5));				
+				ProduktBatchKompDTO current = new ProduktBatchKompDTO(rs.getInt(1), rs.getInt(2), rs.getDouble(3), rs.getDouble(4), rs.getInt(5), rs.getBoolean(6));				
 				list.add(current);
 			}
 		} catch (SQLException e) {
@@ -58,7 +58,7 @@ public class MYSQLProduktBatchKompDAO implements ProduktBatchKompDAO {
 		try{
 			ResultSet rs = Connector.getInstance().doQuery("SELECT * FROM produktbatchkomponent;");
 			while (rs.next()){
-				ProduktBatchKompDTO current = new ProduktBatchKompDTO(rs.getInt(1), rs.getInt(2), rs.getDouble(3), rs.getDouble(4), rs.getInt(5));				
+				ProduktBatchKompDTO current = new ProduktBatchKompDTO(rs.getInt(1), rs.getInt(2), rs.getDouble(3), rs.getDouble(4), rs.getInt(5), rs.getBoolean(6));				
 				list.add(current);
 			}
 		} catch (SQLException e) {
@@ -87,10 +87,14 @@ public class MYSQLProduktBatchKompDAO implements ProduktBatchKompDAO {
 	@Override
 	public void updateProduktBatchKomp(ProduktBatchKompDTO produktbatchkomponent) throws DALException {
 		try {
+			int temp = 0;
+			if(produktbatchkomponent.getDone()){
+				temp = 1;
+			}
 			Connector.getInstance().doUpdate(
 					"UPDATE produktbatchkomponent SET  tara= " + produktbatchkomponent.getTara()
 					+ ", netto =  " + produktbatchkomponent.getNetto()
-					+ ", oprId = " + produktbatchkomponent.getOprId()+ " WHERE pbId = " +
+					+ ", oprId = " + produktbatchkomponent.getOprId()+ ", done = "+temp+" WHERE pbId = " +
 					produktbatchkomponent.getPbId() + " and rbId  = " + produktbatchkomponent.getRbId()+";");
 			
 		} catch (SQLException e) {
