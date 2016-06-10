@@ -20,18 +20,17 @@ public class JUnit_Recept {
 
 	private static MYSQLReceptDAO recept;
 	private static ReceptDTO receptDTO;
-	
+
 	@Test
-	public void a_getListRecept(){
+	public void a_getListRecept() {
 		recept = new MYSQLReceptDAO();
-		receptDTO = new ReceptDTO("Ananas"); 
-		try{
+		receptDTO = new ReceptDTO("Ananas");
+		try {
 			List<ReceptDTO> liste = recept.getReceptList();
-			if(liste == null){
+			if (liste == null) {
 				fail("Gotten list is null!");
-			}
-			else{
-				if(liste.size() == 0){
+			} else {
+				if (liste.size() == 0) {
 					fail("Either database is empty, or couldnt get proper list!");
 				}
 			}
@@ -39,14 +38,14 @@ public class JUnit_Recept {
 			fail("Could not get list of recept!");
 		}
 	}
-	
+
 	@Test
-	public void b_addRecept(){
+	public void b_addRecept() {
 		try {
 			List<ReceptDTO> liste = recept.getReceptList();
-			for(int i = 0; i < liste.size(); i++){
-				if(liste.get(i).getReceptNavn().equals(receptDTO.getReceptNavn())){
-					if(liste.get(i).getReceptId() == receptDTO.getReceptId()){
+			for (int i = 0; i < liste.size(); i++) {
+				if (liste.get(i).getReceptNavn().equals(receptDTO.getReceptNavn())) {
+					if (liste.get(i).getReceptId() == receptDTO.getReceptId()) {
 						fail("Already exist recept with those and cant add!");
 					}
 				}
@@ -65,21 +64,20 @@ public class JUnit_Recept {
 	public void c_getRecept() {
 		try {
 			ReceptDTO test = recept.getRecept(receptDTO.getReceptId());
-			if(test != null){
-				if(!(test.getReceptNavn().equals(receptDTO.getReceptNavn()))){
+			if (test != null) {
+				if (!(test.getReceptNavn().equals(receptDTO.getReceptNavn()))) {
 					fail("Gotten recept not equal to DTO");
 				}
-			}
-			else{
+			} else {
 				fail("Gotten recept is null!");
 			}
 		} catch (DALException e) {
 			fail("Could not get recept!");
 		}
 	}
-	
+
 	@Test
-	public void d_updateRecept(){
+	public void d_updateRecept() {
 		try {
 			receptDTO.setReceptNavn("Banan");
 			recept.updateRecept(receptDTO);
@@ -89,9 +87,9 @@ public class JUnit_Recept {
 			fail("error getting updating recept!");
 		}
 	}
-	
+
 	@Test
-	public void e_getFullRecept(){
+	public void e_getFullRecept() {
 		ResultSet set = recept.getFullRecept("margherita");
 		try {
 			assertEquals(set.getString(2), "dej");
@@ -100,4 +98,3 @@ public class JUnit_Recept {
 		}
 	}
 }
-

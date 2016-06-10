@@ -21,21 +21,21 @@ public class JUnit_Roller {
 	private static MYSQLRollerDAO roller;
 	private static MYSQLOperatoerDAO operatoer;
 	private static RollerDTO rollerDTO;
-	private static OperatoerDTO operatoerDTO; //only used because there must a operatoerDTO with a roller
-	
+	private static OperatoerDTO operatoerDTO; // only used because there must a
+												// operatoerDTO with a roller
+
 	@Test
-	public void a_getListRoller(){
+	public void a_getListRoller() {
 		roller = new MYSQLRollerDAO();
 		operatoerDTO = new OperatoerDTO("Morten", "MJ", "121291-1212", "testpass");
 		rollerDTO = new RollerDTO(0, true, false, false);
 		operatoer = new MYSQLOperatoerDAO();
 		try {
 			List<RollerDTO> listtest = roller.getRolleList();
-			if(listtest == null){
+			if (listtest == null) {
 				fail("Gotten list is null!");
-			}
-			else{
-				if(listtest.size() == 0){
+			} else {
+				if (listtest.size() == 0) {
 					fail("Either database is empty, or couldnt get proper list!");
 				}
 			}
@@ -43,27 +43,27 @@ public class JUnit_Roller {
 			fail("Could not get list of roller!");
 		}
 	}
-	
+
 	@Test
-	public void b_addOperatoerOgRolle(){
+	public void b_addOperatoerOgRolle() {
 		try {
-			operatoer.createOperatoer(operatoerDTO, rollerDTO.isAdministrator(), rollerDTO.isFarmaceut(), rollerDTO.isVaerkfoerer());
+			operatoer.createOperatoer(operatoerDTO, rollerDTO.isAdministrator(), rollerDTO.isFarmaceut(),
+					rollerDTO.isVaerkfoerer());
 			rollerDTO.setOpr_id(operatoerDTO.getOprId());
 		} catch (DALException e) {
 			fail("Could not createoperatoer");
 		}
 	}
-	
+
 	@Test
 	public void c_getRoller() {
 		try {
 			RollerDTO test = roller.getRolle(rollerDTO.getOpr_id());
-			if(test != null){
-				if(!(test.isAdministrator() == rollerDTO.isAdministrator())){
+			if (test != null) {
+				if (!(test.isAdministrator() == rollerDTO.isAdministrator())) {
 					fail("Gotten rolle not equal to DTO");
 				}
-			}
-			else{
+			} else {
 				fail("Gotten rolle is null!");
 			}
 		} catch (DALException e) {
@@ -72,7 +72,7 @@ public class JUnit_Roller {
 	}
 
 	@Test
-	public void d_updateRoller(){
+	public void d_updateRoller() {
 		try {
 			roller.updateRolle(rollerDTO, false, false, true);
 			RollerDTO temp = roller.getRolle(rollerDTO.getOpr_id());

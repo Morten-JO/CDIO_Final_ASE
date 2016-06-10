@@ -6,15 +6,15 @@ public class RollerDTO {
 	private boolean administrator;
 	private boolean farmaceut;
 	private boolean vaerkfoerer;
-	
-	public RollerDTO(int opr_id, boolean administrator, boolean farmaceut, boolean vaerkfoerer){
+
+	public RollerDTO(int opr_id, boolean administrator, boolean farmaceut, boolean vaerkfoerer) {
 		this.opr_id = opr_id;
 		this.administrator = administrator;
 		this.farmaceut = farmaceut;
 		this.vaerkfoerer = vaerkfoerer;
 	}
-	
-	public RollerDTO(RollerDTO rolle){
+
+	public RollerDTO(RollerDTO rolle) {
 		this.opr_id = rolle.getOpr_id();
 		this.administrator = rolle.isAdministrator();
 		this.farmaceut = rolle.isFarmaceut();
@@ -52,7 +52,5 @@ public class RollerDTO {
 	public void setVaerkfoerer(boolean vaerkfoerer) {
 		this.vaerkfoerer = vaerkfoerer;
 	}
-	
-	
-	
+
 }

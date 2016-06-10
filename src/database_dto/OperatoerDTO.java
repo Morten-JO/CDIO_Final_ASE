@@ -36,7 +36,6 @@ public class OperatoerDTO {
 		this.password = opr.getPassword();
 	}
 
-
 	public String getOprNavn() {
 		return oprNavn;
 	}

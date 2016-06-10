@@ -8,7 +8,7 @@ import java.net.Socket;
 import dao.DatabaseHandler;
 import input.HelpFunctions;
 
-public class WeightingProcedure implements Runnable{
+public class WeightingProcedure implements Runnable {
 
 	private boolean running;
 	private Socket socket;
@@ -16,28 +16,31 @@ public class WeightingProcedure implements Runnable{
 	private WeightingCommunication comm;
 	private DatabaseHandler handler;
 	private String[] raavare;
-	private int transactionProduktBatchID = -1;//-1 to force sqlException to prevent integrity issues in case of failure before receiving batchID
+	private int transactionProduktBatchID = -1;// -1 to force sqlException to
+												// prevent integrity issues in
+												// case of failure before
+												// receiving batchID
 	private int currentOperatoerID;
 	boolean validOprId = false;
-	
-	public WeightingProcedure(Socket socket, BufferedReader reader, PrintWriter writer, DatabaseHandler handler){
+
+	public WeightingProcedure(Socket socket, BufferedReader reader, PrintWriter writer, DatabaseHandler handler) {
 		this.socket = socket;
 		comm = new WeightingCommunication(reader, writer);
 		running = true;
 		this.thread = new Thread(this);
 		this.handler = handler;
 	}
-	
-	public void start(){
+
+	public void start() {
 		thread.start();
 	}
-	
+
 	@Override
 	public void run() {
-		while(running){
+		while (running) {
 			try {
 				handleUserConfirmId();
-				if(handleGetProduktBatchReceptName()){
+				if (handleGetProduktBatchReceptName()) {
 					handleMeasuringLoop();
 				}
 			} catch (IOException | NullPointerException e) {
@@ -48,97 +51,99 @@ public class WeightingProcedure implements Runnable{
 			}
 		}
 	}
-	
-	public Socket getSocket(){
+
+	public Socket getSocket() {
 		return socket;
 	}
-	
+
 	/**
 	 * Used for the procedure 2-4
 	 */
-	private void handleUserConfirmId() throws IOException, NullPointerException{
-		while(!validOprId){
+	private void handleUserConfirmId() throws IOException, NullPointerException {
+		while (!validOprId) {
 			String str = comm.writeReadRM20("RM20 8 \"Enter ID\" \"\" \"&3\"");
-			if(str.contains("RM20 A")){
+			if (str.contains("RM20 A")) {
 				String[] splits = str.split(" ");
-				if(splits.length > 2){
+				if (splits.length > 2) {
 					handlerUserConfirmIdParse(splits);
 				}
-			} 
+			}
 		}
 	}
 
 	private void handlerUserConfirmIdParse(String[] splits) throws IOException {
 		String id = splits[2];
 		id = id.replace("\"", "");
-		try{
+		try {
 			int integer_id = Integer.parseInt(id);
 			currentOperatoerID = integer_id;
 			String name = handler.getOperatoerNameFromId(integer_id);
-			if(name != null){
-				//RM20 commands can only take up to max 23 characters in text
-				String cuttedString = HelpFunctions.cutStringRM20("Confirm name: "+name);
-				String str2 = comm.writeReadRM20("RM20 8 \""+cuttedString+"\" \"\" \"&3\"");
-				if(str2.contains("RM20 A")){
+			if (name != null) {
+				// RM20 commands can only take up to max 23 characters in text
+				String cuttedString = HelpFunctions.cutStringRM20("Confirm name: " + name);
+				String str2 = comm.writeReadRM20("RM20 8 \"" + cuttedString + "\" \"\" \"&3\"");
+				if (str2.contains("RM20 A")) {
 					validOprId = true;
 				}
 			}
-		} catch(NumberFormatException e){
+		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * Used for the procedure 5-6
+	 * 
 	 * @return
 	 */
-	private boolean handleGetProduktBatchReceptName() throws IOException, NullPointerException{
-			String str = comm.writeReadRM20("RM20 8 \"Enter produktbatch nr\" \"\" \"&3\"");
-			if(str.startsWith("RM20 A")){
-				String[] splits = str.split(" ");
-				if(splits.length > 2){
-					if(handleGetProduktBatchReceptNameParser(splits)){
-						return true;
-					}
+	private boolean handleGetProduktBatchReceptName() throws IOException, NullPointerException {
+		String str = comm.writeReadRM20("RM20 8 \"Enter produktbatch nr\" \"\" \"&3\"");
+		if (str.startsWith("RM20 A")) {
+			String[] splits = str.split(" ");
+			if (splits.length > 2) {
+				if (handleGetProduktBatchReceptNameParser(splits)) {
+					return true;
 				}
-			} else{
-				//force allow script to beginning
-				validOprId = false;
 			}
-			
+		} else {
+			// force allow script to beginning
+			validOprId = false;
+		}
+
 		return false;
 	}
 
 	private boolean handleGetProduktBatchReceptNameParser(String[] splits) throws IOException {
 		String id = splits[2];
 		id = id.replace("\"", "");
-		try{
+		try {
 			int integer_id = Integer.parseInt(id);
 			transactionProduktBatchID = integer_id;
 			String name = handler.getReceptNameFromProduktBatchId(transactionProduktBatchID);
-			if(handler.isStatusFreeFromProduktBatchId(transactionProduktBatchID)){
-				if(name != null){
-					comm.writeReadLines("P111 \"Ingredient: "+name+"\"");
-					raavare = handler.getRaavareForProduktBatch(handler.getReceptIdFromProduktBatchId(transactionProduktBatchID));
+			if (handler.isStatusFreeFromProduktBatchId(transactionProduktBatchID)) {
+				if (name != null) {
+					comm.writeReadLines("P111 \"Ingredient: " + name + "\"");
+					raavare = handler.getRaavareForProduktBatch(
+							handler.getReceptIdFromProduktBatchId(transactionProduktBatchID));
 					return true;
 				}
-			}
-			else{
+			} else {
 				comm.writeReadRM20("RM20 8 \"Produktbatch is done\" \"\" \"&3\"");
 			}
-		} catch(NumberFormatException e){}
+		} catch (NumberFormatException e) {
+		}
 		return false;
 	}
-	
+
 	/**
 	 * Used for the procedure 8-end
 	 */
-	private void handleMeasuringLoop() throws IOException, NullPointerException{
+	private void handleMeasuringLoop() throws IOException, NullPointerException {
 		int doneItems = handler.getDoneRaavareForProduktBatch(transactionProduktBatchID);
-		for(int i = doneItems; i < raavare.length; i++){
+		for (int i = doneItems; i < raavare.length; i++) {
 			String str = comm.writeReadRM20("RM20 8 \"Confirm empty weight\" \"\" \"&3\"");
-			if(str.startsWith("RM20 A")){
-				if(!handleRaavareMeasurement(i)){
+			if (str.startsWith("RM20 A")) {
+				if (!handleRaavareMeasurement(i)) {
 					break;
 				}
 			}
@@ -146,26 +151,26 @@ public class WeightingProcedure implements Runnable{
 	}
 
 	private boolean handleRaavareMeasurement(int i) throws IOException {
-		comm.writeReadLines("P111 \"Ingredient: "+raavare[i]+"\"");
+		comm.writeReadLines("P111 \"Ingredient: " + raavare[i] + "\"");
 		handler.setProduktBatchStatus(transactionProduktBatchID, 1);
 		comm.writeReadLines("T");
 		String res = comm.writeReadRM20("RM20 8 \"Place tara container\" \"\" \"&3\"");
-		if(res.startsWith("RM20 A")){
+		if (res.startsWith("RM20 A")) {
 			String tara = comm.writeReadLines("T");
 			String resp = comm.writeReadRM20("RM20 8 \"Enter raavarebatch nr:\" \"\" \"&3\"");
-			if(resp.startsWith("RM20 A")){
+			if (resp.startsWith("RM20 A")) {
 				String[] respSplit = resp.split(" ");
-				if(respSplit.length > 2){
+				if (respSplit.length > 2) {
 					handleRaavareMeasurementStepTwo(i, tara, respSplit);
 					return true;
 				}
-			} else{
-				//force run to beginning
+			} else {
+				// force run to beginning
 				validOprId = false;
 				return false;
 			}
-		} else{
-			//force run to beginning
+		} else {
+			// force run to beginning
 			validOprId = false;
 			return false;
 		}
@@ -175,46 +180,50 @@ public class WeightingProcedure implements Runnable{
 	private void handleRaavareMeasurementStepTwo(int i, String tara, String[] respSplit) throws IOException {
 		String rb_id = respSplit[2];
 		rb_id = rb_id.replace("\"", "");
-		try{
+		try {
 			int integer_id = Integer.parseInt(rb_id);
 			double maengde = handler.getMaengdeFromRBIDandPBID(integer_id, transactionProduktBatchID);
-			
-			comm.writeReadLines("P111 \"Ingre: "+raavare[i]+" Amount: "+maengde+"\"");
+
+			comm.writeReadLines("P111 \"Ingre: " + raavare[i] + " Amount: " + maengde + "\"");
 			double maengdeOnWeight = 0.0;
 			boolean isInTolerance = false;
 			double toleranceAmount = handler.getToleranceFromRBIDandPBID(integer_id, transactionProduktBatchID);
-			comm.writeReadLines("P121 "+HelpFunctions.roundDouble(maengde, 2)+" kg "+HelpFunctions.roundDouble((maengde * toleranceAmount/100), 2)+" kg "+HelpFunctions.roundDouble((maengde * toleranceAmount/100),2)+" kg");
+			comm.writeReadLines("P121 " + HelpFunctions.roundDouble(maengde, 2) + " kg "
+					+ HelpFunctions.roundDouble((maengde * toleranceAmount / 100), 2) + " kg "
+					+ HelpFunctions.roundDouble((maengde * toleranceAmount / 100), 2) + " kg");
 			comm.writeReadLines("ST 1");
-			while(!isInTolerance){
+			while (!isInTolerance) {
 				String maengdeWeight = comm.getReader().readLine();
-				maengdeOnWeight = Double.parseDouble(maengdeWeight.substring(7, maengdeWeight.length()-3));
-				if(maengdeOnWeight > (maengde - maengde * toleranceAmount/100) && maengdeOnWeight < (maengde + maengde * toleranceAmount/100)){
+				maengdeOnWeight = Double.parseDouble(maengdeWeight.substring(7, maengdeWeight.length() - 3));
+				if (maengdeOnWeight > (maengde - maengde * toleranceAmount / 100)
+						&& maengdeOnWeight < (maengde + maengde * toleranceAmount / 100)) {
 					isInTolerance = true;
-				} else{
+				} else {
 					comm.writeReadRM20("RM20 8 \"Not in tolerance!\" \"\" \"&3\"");
 				}
 			}
 			comm.writeReadLines("ST 0");
-			double taraOnWeight = Double.parseDouble(tara.substring(7, tara.length()-3));
-			handler.updateProduktBatchKomponent(transactionProduktBatchID, integer_id, taraOnWeight, maengdeOnWeight, currentOperatoerID, true);
+			double taraOnWeight = Double.parseDouble(tara.substring(7, tara.length() - 3));
+			handler.updateProduktBatchKomponent(transactionProduktBatchID, integer_id, taraOnWeight, maengdeOnWeight,
+					currentOperatoerID, true);
 			handler.removeNettoFromRaavareBatch(integer_id, maengdeOnWeight);
-			if(i != raavare.length-1){
+			if (i != raavare.length - 1) {
 				comm.writeReadRM20("RM20 8 \"Finished item\" \"\" \"&3\"");
-			} else{
+			} else {
 				comm.writeReadRM20("RM20 8 \"Done! Resetting.\" \"\" \"&3\"");
 				handler.setProduktBatchStatus(transactionProduktBatchID, 2);
 			}
-		} catch(NumberFormatException e){
+		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public boolean isRunning(){
+	public boolean isRunning() {
 		return running;
 	}
-	
-	public void setRunning(boolean running){
+
+	public void setRunning(boolean running) {
 		this.running = running;
 	}
-	
+
 }

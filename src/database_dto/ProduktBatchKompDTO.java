@@ -56,12 +56,12 @@ public class ProduktBatchKompDTO {
 	public void setOprId(int oprId) {
 		this.oprId = oprId;
 	}
-	
-	public boolean getDone(){
+
+	public boolean getDone() {
 		return done;
 	}
-	
-	public void setDone(boolean done){
+
+	public void setDone(boolean done) {
 		this.done = done;
 	}
 

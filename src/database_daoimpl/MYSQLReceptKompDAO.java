@@ -72,30 +72,31 @@ public class MYSQLReceptKompDAO implements ReceptKompDAO {
 	@Override
 	public void createReceptKomp(ReceptKompDTO receptkomponent) throws DALException {
 		try {
-		    CallableStatement createRecept = (CallableStatement) Connector.getInstance().getConnection().prepareCall("call add_receptkomponent(?,?,?,?,?)");
-		    createRecept.setInt(1, receptkomponent.getReceptId());
-		    createRecept.setInt(2, receptkomponent.getRaavareId());
-		    createRecept.setDouble(3, receptkomponent.getNomNetto());
-		    createRecept.setDouble(4, receptkomponent.getTolerance());
-		    createRecept.setInt(5, 0);
-		    createRecept.execute();
-		   
-		   } catch (Exception e) {
-			   e.printStackTrace();
-			   System.err.println("Could not create receptkomponent, check if the database is running!");
-		  }
+			CallableStatement createRecept = (CallableStatement) Connector.getInstance().getConnection()
+					.prepareCall("call add_receptkomponent(?,?,?,?,?)");
+			createRecept.setInt(1, receptkomponent.getReceptId());
+			createRecept.setInt(2, receptkomponent.getRaavareId());
+			createRecept.setDouble(3, receptkomponent.getNomNetto());
+			createRecept.setDouble(4, receptkomponent.getTolerance());
+			createRecept.setInt(5, 0);
+			createRecept.execute();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("Could not create receptkomponent, check if the database is running!");
+		}
 	}
 
 	@Override
 	public void updateReceptKomp(ReceptKompDTO receptkomponent) throws DALException {
 		try {
-			Connector.getInstance().doUpdate(
-					"UPDATE receptkomponent SET nomNetto =  " + receptkomponent.getNomNetto()
-					+ ", tolerance = " + receptkomponent.getTolerance()+ " WHERE receptId = " +
-					receptkomponent.getReceptId() +" and raavareId = "+receptkomponent.getRaavareId());
-			
+			Connector.getInstance()
+					.doUpdate("UPDATE receptkomponent SET nomNetto =  " + receptkomponent.getNomNetto()
+							+ ", tolerance = " + receptkomponent.getTolerance() + " WHERE receptId = "
+							+ receptkomponent.getReceptId() + " and raavareId = " + receptkomponent.getRaavareId());
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 }

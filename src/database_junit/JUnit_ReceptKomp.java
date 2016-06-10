@@ -13,24 +13,22 @@ import database_daoimpl.MYSQLReceptKompDAO;
 import database_daointerfaces.DALException;
 import database_dto.ReceptKompDTO;
 
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class JUnit_ReceptKomp {
 
 	private static MYSQLReceptKompDAO receptkomp;
 	private static ReceptKompDTO receptkompDTO;
-	
+
 	@Test
-	public void a_getListReceptKomp(){
+	public void a_getListReceptKomp() {
 		receptkomp = new MYSQLReceptKompDAO();
 		receptkompDTO = new ReceptKompDTO(3, 2, 20, 0.1);
-		try{
+		try {
 			List<ReceptKompDTO> liste = receptkomp.getReceptKompList();
-			if(liste == null){
+			if (liste == null) {
 				fail("Gotten list is null!");
-			}
-			else{
-				if(liste.size() == 0){
+			} else {
+				if (liste.size() == 0) {
 					fail("Either database is empty, or couldnt get proper list!");
 				}
 			}
@@ -38,14 +36,14 @@ public class JUnit_ReceptKomp {
 			fail("Could not get list of receptkomps!");
 		}
 	}
-	
+
 	@Test
-	public void b_addReceptKomp(){
+	public void b_addReceptKomp() {
 		try {
 			List<ReceptKompDTO> liste = receptkomp.getReceptKompList();
-			for(int i = 0; i < liste.size(); i++){
-				if(liste.get(i).getRaavareId() == receptkompDTO.getRaavareId()){
-					if(liste.get(i).getReceptId() == receptkompDTO.getReceptId()){
+			for (int i = 0; i < liste.size(); i++) {
+				if (liste.get(i).getRaavareId() == receptkompDTO.getRaavareId()) {
+					if (liste.get(i).getReceptId() == receptkompDTO.getReceptId()) {
 						fail("Already exist receptkomp with those and cant add!");
 					}
 				}
@@ -64,19 +62,18 @@ public class JUnit_ReceptKomp {
 	public void c_getReceptKomp() {
 		try {
 			ReceptKompDTO test = receptkomp.getReceptKomp(receptkompDTO.getReceptId(), receptkompDTO.getRaavareId());
-			if(test != null){
+			if (test != null) {
 				assertEquals(test.getNomNetto(), receptkompDTO.getNomNetto(), 0.1);
-			}
-			else{
+			} else {
 				fail("Gotten receptkomp is null!");
 			}
 		} catch (DALException e) {
 			fail("Could not get receptkomp!");
 		}
 	}
-	
+
 	@Test
-	public void d_updateReceptKomp(){
+	public void d_updateReceptKomp() {
 		try {
 			receptkompDTO.setNomNetto(2500);
 			receptkomp.updateReceptKomp(receptkompDTO);
@@ -87,4 +84,3 @@ public class JUnit_ReceptKomp {
 		}
 	}
 }
-

@@ -12,7 +12,6 @@ import database_daoimpl.MYSQLRaavareBatchDAO;
 import database_daoimpl.MYSQLReceptDAO;
 import database_daoimpl.MYSQLReceptKompDAO;
 import database_daointerfaces.DALException;
-import database_daointerfaces.ProduktBatchKompDAO;
 import database_dto.OperatoerDTO;
 import database_dto.ProduktBatchDTO;
 import database_dto.ProduktBatchKompDTO;
@@ -21,8 +20,8 @@ import database_dto.ReceptDTO;
 import database_dto.ReceptKompDTO;
 
 public class DatabaseHandler {
-	
-	public String getOperatoerNameFromId(int id){
+
+	public String getOperatoerNameFromId(int id) {
 		MYSQLOperatoerDAO dao = new MYSQLOperatoerDAO();
 		OperatoerDTO dto = null;
 		try {
@@ -30,15 +29,14 @@ public class DatabaseHandler {
 		} catch (DALException e) {
 			e.printStackTrace();
 		}
-		if(dto != null){
+		if (dto != null) {
 			return dto.getOprNavn();
-		}
-		else{
+		} else {
 			return null;
 		}
 	}
-	
-	public String getReceptNameFromProduktBatchId(int id){
+
+	public String getReceptNameFromProduktBatchId(int id) {
 		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
 		ProduktBatchDTO dto = null;
 		try {
@@ -46,7 +44,7 @@ public class DatabaseHandler {
 		} catch (DALException e) {
 			e.printStackTrace();
 		}
-		if(dto != null){
+		if (dto != null) {
 			MYSQLReceptDAO dao2 = new MYSQLReceptDAO();
 			ReceptDTO dto2 = null;
 			try {
@@ -54,27 +52,25 @@ public class DatabaseHandler {
 			} catch (DALException e) {
 				e.printStackTrace();
 			}
-			if(dto2 != null){
+			if (dto2 != null) {
 				return dto2.getReceptNavn();
-			}
-			else{
+			} else {
 				return "";
 			}
-		}
-		else{
+		} else {
 			return "";
 		}
 	}
-	
-	public void setProduktBatchStatus(int id, int status){
+
+	public void setProduktBatchStatus(int id, int status) {
 		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
 		ProduktBatchDTO dto = null;
 		try {
 			dto = dao.getProduktBatch(id);
-		} catch (DALException e){
+		} catch (DALException e) {
 			e.printStackTrace();
 		}
-		if(dto != null){
+		if (dto != null) {
 			dto.setStatus(status);
 			try {
 				dao.updateProduktBatch(dto);
@@ -83,15 +79,15 @@ public class DatabaseHandler {
 			}
 		}
 	}
-	
-	public String[] getRaavareForProduktBatch(int id){
+
+	public String[] getRaavareForProduktBatch(int id) {
 		try {
-			ResultSet set = Connector.getInstance().doQuery("select * from raavare natural join receptkomponent where receptId = "+id+";");
+			ResultSet set = Connector.getInstance()
+					.doQuery("select * from raavare natural join receptkomponent where receptId = " + id + ";");
 			ArrayList<String> list = new ArrayList<String>();
-			while (set.next()) 
-			{
+			while (set.next()) {
 				list.add(set.getString(2));
-				 
+
 			}
 			String[] strs = new String[list.size()];
 			strs = list.toArray(strs);
@@ -101,8 +97,8 @@ public class DatabaseHandler {
 		}
 		return null;
 	}
-	
-	public Double getMaengdeFromRaavareBatchId(int id){
+
+	public Double getMaengdeFromRaavareBatchId(int id) {
 		MYSQLRaavareBatchDAO dao = new MYSQLRaavareBatchDAO();
 		RaavareBatchDTO dto = null;
 		try {
@@ -113,8 +109,8 @@ public class DatabaseHandler {
 		}
 		return 0.0;
 	}
-	
-	public int getReceptIdFromProduktBatchId(int id){
+
+	public int getReceptIdFromProduktBatchId(int id) {
 		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
 		ProduktBatchDTO dto = null;
 		try {
@@ -125,8 +121,8 @@ public class DatabaseHandler {
 		}
 		return 0;
 	}
-	
-	public boolean updateProduktBatchKomponent(int pbId, int rbId, double tara, double netto, int oprId, boolean done){
+
+	public boolean updateProduktBatchKomponent(int pbId, int rbId, double tara, double netto, int oprId, boolean done) {
 		MYSQLProduktBatchKompDAO dao = new MYSQLProduktBatchKompDAO();
 		try {
 			ProduktBatchKompDTO dto = dao.getProduktBatchKomp(pbId, rbId);
@@ -141,12 +137,12 @@ public class DatabaseHandler {
 		}
 		return false;
 	}
-	
-	public boolean removeNettoFromRaavareBatch(int rbId, double amount){
+
+	public boolean removeNettoFromRaavareBatch(int rbId, double amount) {
 		MYSQLRaavareBatchDAO dao = new MYSQLRaavareBatchDAO();
 		try {
 			RaavareBatchDTO dto = dao.getRaavareBatch(rbId);
-			dto.setMaengde(dto.getMaengde()-amount);
+			dto.setMaengde(dto.getMaengde() - amount);
 			dao.updateRaavareBatch(dto);
 			return true;
 		} catch (DALException e) {
@@ -154,12 +150,12 @@ public class DatabaseHandler {
 		}
 		return false;
 	}
-	
-	public boolean hasEnoughFromRaavareBatch(int rbId, double amount){
+
+	public boolean hasEnoughFromRaavareBatch(int rbId, double amount) {
 		MYSQLRaavareBatchDAO dao = new MYSQLRaavareBatchDAO();
 		try {
 			RaavareBatchDTO dto = dao.getRaavareBatch(rbId);
-			if(dto.getMaengde() >= amount){
+			if (dto.getMaengde() >= amount) {
 				return true;
 			}
 		} catch (DALException e) {
@@ -167,8 +163,8 @@ public class DatabaseHandler {
 		}
 		return false;
 	}
-	
-	public double getMaengdeFromRBIDandPBID(int rbId, int pbId){
+
+	public double getMaengdeFromRBIDandPBID(int rbId, int pbId) {
 		MYSQLRaavareBatchDAO rbDAO = new MYSQLRaavareBatchDAO();
 		MYSQLProduktBatchDAO pbDAO = new MYSQLProduktBatchDAO();
 		MYSQLReceptKompDAO rkDAO = new MYSQLReceptKompDAO();
@@ -182,8 +178,8 @@ public class DatabaseHandler {
 		}
 		return 0.0;
 	}
-	
-	public double getToleranceFromRBIDandPBID(int rbId, int pbId){
+
+	public double getToleranceFromRBIDandPBID(int rbId, int pbId) {
 		MYSQLRaavareBatchDAO rbDAO = new MYSQLRaavareBatchDAO();
 		MYSQLProduktBatchDAO pbDAO = new MYSQLProduktBatchDAO();
 		MYSQLReceptKompDAO rkDAO = new MYSQLReceptKompDAO();
@@ -197,8 +193,8 @@ public class DatabaseHandler {
 		}
 		return 0.0;
 	}
-	
-	public boolean isStatusFreeFromProduktBatchId(int id){
+
+	public boolean isStatusFreeFromProduktBatchId(int id) {
 		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
 		try {
 			ProduktBatchDTO dto = dao.getProduktBatch(id);
@@ -208,13 +204,14 @@ public class DatabaseHandler {
 		}
 		return false;
 	}
-	
-	public int getDoneRaavareForProduktBatch(int id){
+
+	public int getDoneRaavareForProduktBatch(int id) {
 		int finished = 0;
 		try {
-			ResultSet set = Connector.getInstance().doQuery("select * from produktbatchkomponent where pbId = "+id+";");
-			while(set.next()){
-				if(set.getBoolean(6) == true){
+			ResultSet set = Connector.getInstance()
+					.doQuery("select * from produktbatchkomponent where pbId = " + id + ";");
+			while (set.next()) {
+				if (set.getBoolean(6) == true) {
 					finished++;
 				}
 			}
@@ -223,5 +220,5 @@ public class DatabaseHandler {
 		}
 		return finished;
 	}
-	
+
 }

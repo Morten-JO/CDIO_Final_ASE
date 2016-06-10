@@ -18,18 +18,17 @@ public class JUnit_Raavare {
 
 	private static MYSQLRaavareDAO raavare;
 	private static RaavareDTO raavareDTO;
-	
+
 	@Test
-	public void a_getListRaavare(){
+	public void a_getListRaavare() {
 		raavare = new MYSQLRaavareDAO();
 		raavareDTO = new RaavareDTO(8, "Ananas", "DTU");
-		try{
+		try {
 			List<RaavareDTO> liste = raavare.getRaavareList();
-			if(liste == null){
+			if (liste == null) {
 				fail("Gotten list is null!");
-			}
-			else{
-				if(liste.size() == 0){
+			} else {
+				if (liste.size() == 0) {
 					fail("Either database is empty, or couldnt get proper list!");
 				}
 			}
@@ -37,13 +36,13 @@ public class JUnit_Raavare {
 			fail("Could not get list of raavare!");
 		}
 	}
-	
+
 	@Test
-	public void b_addRaavare(){
+	public void b_addRaavare() {
 		try {
 			List<RaavareDTO> liste = raavare.getRaavareList();
-			for(int i = 0; i < liste.size(); i++){
-				if(liste.get(i).getRaavareId() == raavareDTO.getRaavareId()){
+			for (int i = 0; i < liste.size(); i++) {
+				if (liste.get(i).getRaavareId() == raavareDTO.getRaavareId()) {
 					fail("Already exist raavare with those and cant add!");
 				}
 			}
@@ -61,19 +60,18 @@ public class JUnit_Raavare {
 	public void c_getRaavare() {
 		try {
 			RaavareDTO test = raavare.getRaavare(raavareDTO.getRaavareId());
-			if(test != null){
+			if (test != null) {
 				assertEquals(test.getRaavareNavn(), raavareDTO.getRaavareNavn());
-			}
-			else{
+			} else {
 				fail("Gotten raavare is null!");
 			}
 		} catch (DALException e) {
 			fail("Could not get raavare!");
 		}
 	}
-	
+
 	@Test
-	public void d_updateRaavare(){
+	public void d_updateRaavare() {
 		try {
 			raavareDTO.setRaavareNavn("Banan");
 			raavare.updateRaavare(raavareDTO);

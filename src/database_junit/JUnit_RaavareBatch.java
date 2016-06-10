@@ -18,18 +18,17 @@ public class JUnit_RaavareBatch {
 
 	private static MYSQLRaavareBatchDAO raavarebatch;
 	private static RaavareBatchDTO raavarebatchDTO;
-	
+
 	@Test
-	public void a_getListRaavareBatch(){
+	public void a_getListRaavareBatch() {
 		raavarebatch = new MYSQLRaavareBatchDAO();
 		raavarebatchDTO = new RaavareBatchDTO(8, 7, 100);
-		try{
+		try {
 			List<RaavareBatchDTO> liste = raavarebatch.getRaavareBatchList();
-			if(liste == null){
+			if (liste == null) {
 				fail("Gotten list is null!");
-			}
-			else{
-				if(liste.size() == 0){
+			} else {
+				if (liste.size() == 0) {
 					fail("Either database is empty, or couldnt get proper list!");
 				}
 			}
@@ -37,13 +36,13 @@ public class JUnit_RaavareBatch {
 			fail("Could not get list of raavarebatches!");
 		}
 	}
-	
+
 	@Test
-	public void b_addRaavareBatch(){
+	public void b_addRaavareBatch() {
 		try {
 			List<RaavareBatchDTO> liste = raavarebatch.getRaavareBatchList();
-			for(int i = 0; i < liste.size(); i++){
-				if(liste.get(i).getRbId() == raavarebatchDTO.getRbId()){
+			for (int i = 0; i < liste.size(); i++) {
+				if (liste.get(i).getRbId() == raavarebatchDTO.getRbId()) {
 					fail("Already exist raavarebatch with those and cant add!");
 				}
 			}
@@ -61,19 +60,18 @@ public class JUnit_RaavareBatch {
 	public void c_getRaavareBatch() {
 		try {
 			RaavareBatchDTO test = raavarebatch.getRaavareBatch(raavarebatchDTO.getRbId());
-			if(test != null){
+			if (test != null) {
 				assertEquals(test.getMaengde(), raavarebatchDTO.getMaengde(), 0.1);
-			}
-			else{
+			} else {
 				fail("Gotten raavarebatch is null!");
 			}
 		} catch (DALException e) {
 			fail("Could not get raavarebatch!");
 		}
 	}
-	
+
 	@Test
-	public void d_updateRaavareBatch(){
+	public void d_updateRaavareBatch() {
 		try {
 			raavarebatchDTO.setMaengde(5000);
 			raavarebatch.updateRaavareBatch(raavarebatchDTO);

@@ -11,7 +11,7 @@ import java.util.Observable;
 import communication.WeightingProcedure;
 import dao.DatabaseHandler;
 
-public class SocketHandler extends Observable{
+public class SocketHandler extends Observable {
 
 	private boolean running;
 	private Socket socket;
@@ -21,7 +21,7 @@ public class SocketHandler extends Observable{
 	private WeightingProcedure[] coms;
 	private long timePerStart = 3600000;
 	private boolean forceStart;
-	
+
 	public SocketHandler(String[] ips, int port) {
 		running = true;
 		this.ips = ips;
@@ -29,34 +29,34 @@ public class SocketHandler extends Observable{
 		handler = new DatabaseHandler();
 		coms = new WeightingProcedure[ips.length];
 	}
-	
+
 	public void start() {
-		while(running){
+		while (running) {
 			forceStart = false;
 			connectToWeights();
 			long timeToReach = System.currentTimeMillis() + timePerStart;
-			while(timeToReach > System.currentTimeMillis() && !forceStart){
+			while (timeToReach > System.currentTimeMillis() && !forceStart) {
 				try {
 					Thread.sleep(50);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				//Waiting amount of time till next attempt to start them.
+				// Waiting amount of time till next attempt to start them.
 			}
 		}
 	}
-	
-	private void connectToWeights(){
-		for(int i = 0; i < ips.length; i++){
+
+	private void connectToWeights() {
+		for (int i = 0; i < ips.length; i++) {
 			boolean shouldStart = false;
-			if(coms[i] == null){
+			if (coms[i] == null) {
 				shouldStart = true;
-			} else{
-				if(!coms[i].isRunning()){
+			} else {
+				if (!coms[i].isRunning()) {
 					shouldStart = true;
 				}
 			}
-			if(shouldStart){
+			if (shouldStart) {
 				try {
 					socket = new Socket();
 					socket.connect(new InetSocketAddress(ips[i], port), 3000);
@@ -65,9 +65,9 @@ public class SocketHandler extends Observable{
 					WeightingProcedure comm = new WeightingProcedure(socket, reader, writer, handler);
 					comm.start();
 					coms[i] = comm;
-					System.out.println("Weight #"+(i+1)+" is now online with ip: "+ips[i]);
-				} catch(IOException e){
-					System.err.println("Weight #"+(i+1)+" is offline with ip: "+ips[i]);
+					System.out.println("Weight #" + (i + 1) + " is now online with ip: " + ips[i]);
+				} catch (IOException e) {
+					System.err.println("Weight #" + (i + 1) + " is offline with ip: " + ips[i]);
 				}
 			}
 		}
@@ -75,31 +75,31 @@ public class SocketHandler extends Observable{
 		setChanged();
 		notifyObservers("update");
 	}
-	
-	public Socket getsocket(){
+
+	public Socket getsocket() {
 		return socket;
 	}
-	
-	public boolean isRunning(){
+
+	public boolean isRunning() {
 		return running;
 	}
-	
-	public void forcePassiveRefresh(){
+
+	public void forcePassiveRefresh() {
 		forceStart = true;
 	}
-	
-	public WeightingProcedure[] getWeights(){
+
+	public WeightingProcedure[] getWeights() {
 		return coms;
 	}
-	
-	public String[] getIps(){
+
+	public String[] getIps() {
 		return ips;
 	}
-	
-	public void shutdownASE(){
-		for(int i = 0; i < coms.length; i++){
-			if(coms[i] != null){
-				if(coms[i].isRunning()){
+
+	public void shutdownASE() {
+		for (int i = 0; i < coms.length; i++) {
+			if (coms[i] != null) {
+				if (coms[i].isRunning()) {
 					coms[i].setRunning(false);
 					try {
 						coms[i].getSocket().close();

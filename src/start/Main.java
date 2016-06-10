@@ -8,11 +8,11 @@ public class Main {
 
 	public static void main(String[] args) {
 		String[] weights = TextReader.getContentsOfFile("res/weights.txt");
-		if(weights != null){
+		if (weights != null) {
 			SocketHandler handler = new SocketHandler(weights, DataVariables.port);
 			new GUIWeightWindow(handler);
 			handler.start();
-		} else{
+		} else {
 			System.err.println("Weights.txt is invalid!");
 		}
 	}
