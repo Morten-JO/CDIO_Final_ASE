@@ -22,6 +22,15 @@ public class GUIWeightWindow extends JFrame {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		this.add(panel);
 		this.pack();
+		int len = handler.getIps().length * 21 + 50;
+		if(len > 450){
+			this.setSize(this.getWidth(), 450);
+		}
+		else{
+			this.setSize(this.getWidth(), len);
+		}
+		
+		
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		WindowListener exiter = new WindowAdapter() {
 

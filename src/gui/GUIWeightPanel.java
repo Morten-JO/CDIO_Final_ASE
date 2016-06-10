@@ -8,6 +8,7 @@ import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
@@ -22,7 +23,7 @@ public class GUIWeightPanel extends JPanel implements Observer {
 	private JButton refreshBtn;
 	private JTextPane textPane;
 	private SocketHandler handler;
-
+	private JScrollPane scrollPane;
 	public GUIWeightPanel(SocketHandler handler) {
 		super();
 		this.handler = handler;
@@ -36,8 +37,9 @@ public class GUIWeightPanel extends JPanel implements Observer {
 		});
 		textPane = new JTextPane();
 		refreshListModel();
+		scrollPane = new JScrollPane(textPane);
 		this.add(refreshBtn);
-		this.add(textPane);
+		this.add(scrollPane);
 	}
 
 	public void refreshListModel() {
