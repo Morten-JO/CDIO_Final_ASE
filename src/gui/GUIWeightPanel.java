@@ -64,7 +64,6 @@ public class GUIWeightPanel extends JPanel implements Observer {
 						document.insertString(document.getLength(),
 								"Weight #" + i + " with ip: " + handler.getIps()[i] + " is ", blackStyle);
 						document.insertString(document.getLength(), "online", greenStyle);
-						System.out.println("is online");
 						if (i != handler.getWeights().length - 1) {
 							document.insertString(document.getLength(), "\r\n", redStyle);
 						}
@@ -76,7 +75,6 @@ public class GUIWeightPanel extends JPanel implements Observer {
 						document.insertString(document.getLength(),
 								"Weight #" + i + " with ip: " + handler.getIps()[i] + " is ", blackStyle);
 						document.insertString(document.getLength(), "offline", redStyle);
-						System.out.println("is offfline");
 						if (i != handler.getWeights().length - 1) {
 							document.insertString(document.getLength(), "\r\n", redStyle);
 						}

@@ -47,6 +47,7 @@ public class SocketHandler extends Observable {
 	}
 
 	private void connectToWeights() {
+		System.out.println("Started Interation");
 		for (int i = 0; i < ips.length; i++) {
 			boolean shouldStart = false;
 			if (coms[i] == null) {
@@ -65,14 +66,15 @@ public class SocketHandler extends Observable {
 					WeightingProcedure comm = new WeightingProcedure(socket, reader, writer, handler);
 					comm.start();
 					coms[i] = comm;
-					System.out.println("Weight #" + (i + 1) + " is now online with ip: " + ips[i]);
+					//System.out.println("Weight #" + (i + 1) + " is now online with ip: " + ips[i]);
 				} catch (IOException e) {
 					coms[i] = null;
-					System.err.println("Weight #" + (i + 1) + " is offline with ip: " + ips[i]);
+					//System.err.println("Weight #" + (i + 1) + " is offline with ip: " + ips[i]);
 				}
 			}
 		}
-		System.out.println("-----------------------------------------");
+		System.out.println("Finished Interation");
+		System.err.println("--------------------");
 		setChanged();
 		notifyObservers("update");
 	}
@@ -113,6 +115,5 @@ public class SocketHandler extends Observable {
 		}
 		running = false;
 		forceStart = true;
-		System.out.println("Shutted system down");
 	}
 }
