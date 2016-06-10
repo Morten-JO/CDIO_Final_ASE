@@ -67,6 +67,7 @@ public class SocketHandler extends Observable {
 					coms[i] = comm;
 					System.out.println("Weight #" + (i + 1) + " is now online with ip: " + ips[i]);
 				} catch (IOException e) {
+					coms[i] = null;
 					System.err.println("Weight #" + (i + 1) + " is offline with ip: " + ips[i]);
 				}
 			}
