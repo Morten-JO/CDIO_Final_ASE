@@ -71,6 +71,11 @@ public class WeightingProcedure implements Runnable {
 		}
 	}
 
+	/**
+	 * Used for the inner procedure 2-4
+	 * @param splits
+	 * @throws IOException
+	 */
 	private void handlerUserConfirmIdParse(String[] splits) throws IOException {
 		String id = splits[2];
 		id = id.replace("\"", "");
@@ -113,6 +118,12 @@ public class WeightingProcedure implements Runnable {
 		return false;
 	}
 
+	/**
+	 * Used for the inner procedure 5-6
+	 * @param splits
+	 * @return
+	 * @throws IOException
+	 */
 	private boolean handleGetProduktBatchReceptNameParser(String[] splits) throws IOException {
 		String id = splits[2];
 		id = id.replace("\"", "");
@@ -150,6 +161,12 @@ public class WeightingProcedure implements Runnable {
 		}
 	}
 
+	/**
+	 * Step one of the inner procedure 8-end
+	 * @param i
+	 * @return
+	 * @throws IOException
+	 */
 	private boolean handleRaavareMeasurement(int i) throws IOException {
 		comm.writeReadLines("P111 \"Ingredient: " + raavare[i] + "\"");
 		handler.setProduktBatchStatus(transactionProduktBatchID, 1);
@@ -177,13 +194,19 @@ public class WeightingProcedure implements Runnable {
 		return false;
 	}
 
+	/**
+	 * Step two of the inner procedure 8-end
+	 * @param i
+	 * @param tara
+	 * @param respSplit
+	 * @throws IOException
+	 */
 	private void handleRaavareMeasurementStepTwo(int i, String tara, String[] respSplit) throws IOException {
 		String rb_id = respSplit[2];
 		rb_id = rb_id.replace("\"", "");
 		try {
 			int integer_id = Integer.parseInt(rb_id);
 			double maengde = handler.getMaengdeFromRBIDandPBID(integer_id, transactionProduktBatchID);
-
 			comm.writeReadLines("P111 \"Ingre: " + raavare[i] + " Amount: " + maengde + "\"");
 			double maengdeOnWeight = 0.0;
 			boolean isInTolerance = false;

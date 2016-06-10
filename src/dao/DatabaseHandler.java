@@ -21,6 +21,11 @@ import database_dto.ReceptKompDTO;
 
 public class DatabaseHandler {
 
+	/**
+	 * Return operatoer name for a operatoer with a id
+	 * @param id
+	 * @return
+	 */
 	public String getOperatoerNameFromId(int id) {
 		MYSQLOperatoerDAO dao = new MYSQLOperatoerDAO();
 		OperatoerDTO dto = null;
@@ -36,6 +41,11 @@ public class DatabaseHandler {
 		}
 	}
 
+	/**
+	 * Get name of recept from a produktbatch ID
+	 * @param id
+	 * @return
+	 */
 	public String getReceptNameFromProduktBatchId(int id) {
 		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
 		ProduktBatchDTO dto = null;
@@ -62,6 +72,11 @@ public class DatabaseHandler {
 		}
 	}
 
+	/**
+	 * Set produktbatch status of a specific produktbatch to the status
+	 * @param id
+	 * @param status
+	 */
 	public void setProduktBatchStatus(int id, int status) {
 		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
 		ProduktBatchDTO dto = null;
@@ -80,6 +95,11 @@ public class DatabaseHandler {
 		}
 	}
 
+	/**
+	 * Return list of raavare needed to be processed for a produktbatch
+	 * @param id
+	 * @return
+	 */
 	public String[] getRaavareForProduktBatch(int id) {
 		try {
 			ResultSet set = Connector.getInstance()
@@ -98,6 +118,11 @@ public class DatabaseHandler {
 		return null;
 	}
 
+	/**
+	 * Get maengde for a raavarebatch based on ID
+	 * @param id
+	 * @return
+	 */
 	public Double getMaengdeFromRaavareBatchId(int id) {
 		MYSQLRaavareBatchDAO dao = new MYSQLRaavareBatchDAO();
 		RaavareBatchDTO dto = null;
@@ -110,6 +135,11 @@ public class DatabaseHandler {
 		return 0.0;
 	}
 
+	/**
+	 * Get recept id from a produktbatch ID
+	 * @param id
+	 * @return
+	 */
 	public int getReceptIdFromProduktBatchId(int id) {
 		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
 		ProduktBatchDTO dto = null;
@@ -122,6 +152,16 @@ public class DatabaseHandler {
 		return 0;
 	}
 
+	/**
+	 * Update produktbatchkomp to the desired values
+	 * @param pbId
+	 * @param rbId
+	 * @param tara
+	 * @param netto
+	 * @param oprId
+	 * @param done
+	 * @return
+	 */
 	public boolean updateProduktBatchKomponent(int pbId, int rbId, double tara, double netto, int oprId, boolean done) {
 		MYSQLProduktBatchKompDAO dao = new MYSQLProduktBatchKompDAO();
 		try {
@@ -138,6 +178,12 @@ public class DatabaseHandler {
 		return false;
 	}
 
+	/**
+	 * Remove netto from the warehouse
+	 * @param rbId
+	 * @param amount
+	 * @return
+	 */
 	public boolean removeNettoFromRaavareBatch(int rbId, double amount) {
 		MYSQLRaavareBatchDAO dao = new MYSQLRaavareBatchDAO();
 		try {
@@ -151,6 +197,12 @@ public class DatabaseHandler {
 		return false;
 	}
 
+	/**
+	 * Check if there is enough raavare in the warehouse for a raavare
+	 * @param rbId
+	 * @param amount
+	 * @return
+	 */
 	public boolean hasEnoughFromRaavareBatch(int rbId, double amount) {
 		MYSQLRaavareBatchDAO dao = new MYSQLRaavareBatchDAO();
 		try {
@@ -164,6 +216,12 @@ public class DatabaseHandler {
 		return false;
 	}
 
+	/**
+	 * Get maengde from a rbId and pbId
+	 * @param rbId
+	 * @param pbId
+	 * @return
+	 */
 	public double getMaengdeFromRBIDandPBID(int rbId, int pbId) {
 		MYSQLRaavareBatchDAO rbDAO = new MYSQLRaavareBatchDAO();
 		MYSQLProduktBatchDAO pbDAO = new MYSQLProduktBatchDAO();
@@ -179,6 +237,12 @@ public class DatabaseHandler {
 		return 0.0;
 	}
 
+	/**
+	 * Get tolerance of an receptkomponent from rbId and pbId
+	 * @param rbId
+	 * @param pbId
+	 * @return
+	 */
 	public double getToleranceFromRBIDandPBID(int rbId, int pbId) {
 		MYSQLRaavareBatchDAO rbDAO = new MYSQLRaavareBatchDAO();
 		MYSQLProduktBatchDAO pbDAO = new MYSQLProduktBatchDAO();
@@ -194,6 +258,11 @@ public class DatabaseHandler {
 		return 0.0;
 	}
 
+	/**
+	 * Check if the status of a produktbatch is 0
+	 * @param id
+	 * @return
+	 */
 	public boolean isStatusFreeFromProduktBatchId(int id) {
 		MYSQLProduktBatchDAO dao = new MYSQLProduktBatchDAO();
 		try {
@@ -205,6 +274,11 @@ public class DatabaseHandler {
 		return false;
 	}
 
+	/**
+	 * Get numbers of raavare done in a specific produktbatch
+	 * @param id
+	 * @return
+	 */
 	public int getDoneRaavareForProduktBatch(int id) {
 		int finished = 0;
 		try {
