@@ -162,7 +162,7 @@ public class DatabaseHandler {
 	 * @param done
 	 * @return
 	 */
-	public boolean updateProduktBatchKomponent(int pbId, int rbId, double tara, double netto, int oprId, boolean done) {
+	public boolean addProduktBatchKomponent(int pbId, int rbId, double tara, double netto, int oprId, boolean done) {
 		MYSQLProduktBatchKompDAO dao = new MYSQLProduktBatchKompDAO();
 		try {
 			ProduktBatchKompDTO dto = dao.getProduktBatchKomp(pbId, rbId);
@@ -170,7 +170,7 @@ public class DatabaseHandler {
 			dto.setNetto(netto);
 			dto.setOprId(oprId);
 			dto.setDone(done);
-			dao.updateProduktBatchKomp(dto);
+			dao.createProduktBatchKomp(dto);
 			return true;
 		} catch (DALException e) {
 			e.printStackTrace();
@@ -294,5 +294,7 @@ public class DatabaseHandler {
 		}
 		return finished;
 	}
+	
+	
 
 }

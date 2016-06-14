@@ -226,7 +226,7 @@ public class WeightingProcedure implements Runnable {
 			}
 			comm.writeReadLines("ST 0");
 			double taraOnWeight = Double.parseDouble(tara.substring(7, tara.length() - 3));
-			handler.updateProduktBatchKomponent(transactionProduktBatchID, integer_id, taraOnWeight, maengdeOnWeight,
+			handler.addProduktBatchKomponent(transactionProduktBatchID, integer_id, taraOnWeight, maengdeOnWeight,
 					currentOperatoerID, true);
 			handler.removeNettoFromRaavareBatch(integer_id, maengdeOnWeight);
 			if (i != raavare.length - 1) {
