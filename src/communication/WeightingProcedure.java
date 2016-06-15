@@ -44,6 +44,7 @@ public class WeightingProcedure implements Runnable {
 					handleMeasuringLoop();
 				}
 			} catch (IOException | NullPointerException e) {
+				e.printStackTrace();
 				running = false;
 				validOprId = true;
 				handler.setProduktBatchStatus(transactionProduktBatchID, 0);
