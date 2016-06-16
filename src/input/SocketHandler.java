@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import communication.WeightingProcedure;
 import dao.DatabaseHandler;
@@ -20,7 +22,8 @@ public class SocketHandler extends Observable {
 	private DatabaseHandler handler;
 	private WeightingProcedure[] coms;
 	private long timePerStart = 3600000;
-	private boolean forceStart;
+	
+	private Timer timer;
 
 	public SocketHandler(String[] ips, int port) {
 		running = true;
@@ -31,23 +34,19 @@ public class SocketHandler extends Observable {
 	}
 
 	public void start() {
-		while (running) {
-			forceStart = false;
-			connectToWeights();
-			long timeToReach = System.currentTimeMillis() + timePerStart;
-			while (timeToReach > System.currentTimeMillis() && !forceStart) {
-				try {
-					Thread.sleep(50);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				// Waiting amount of time till next attempt to start them.
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			
+			@Override
+			public void run() {
+				connectToWeights();
 			}
-		}
+		}, 0, timePerStart);
+		
 	}
 
-	private void connectToWeights() {
-		System.out.println("Started Interation");
+	public void connectToWeights() {
+		System.out.println("Started Connecting Weights");
 		for (int i = 0; i < ips.length; i++) {
 			boolean shouldStart = false;
 			if (coms[i] == null) {
@@ -71,7 +70,7 @@ public class SocketHandler extends Observable {
 				}
 			}
 		}
-		System.out.println("Finished Interation");
+		System.out.println("Finished Connecting weights");
 		System.err.println("--------------------");
 		setChanged();
 		notifyObservers("update");
@@ -83,10 +82,6 @@ public class SocketHandler extends Observable {
 
 	public boolean isRunning() {
 		return running;
-	}
-
-	public void forcePassiveRefresh() {
-		forceStart = true;
 	}
 
 	public WeightingProcedure[] getWeights() {
@@ -112,6 +107,5 @@ public class SocketHandler extends Observable {
 			}
 		}
 		running = false;
-		forceStart = true;
 	}
 }

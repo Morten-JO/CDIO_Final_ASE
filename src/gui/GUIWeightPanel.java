@@ -32,7 +32,7 @@ public class GUIWeightPanel extends JPanel implements Observer {
 		refreshBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				handler.forcePassiveRefresh();
+				handler.connectToWeights();
 			}
 		});
 		textPane = new JTextPane();
